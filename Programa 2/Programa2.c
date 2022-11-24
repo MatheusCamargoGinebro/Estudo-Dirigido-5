@@ -36,8 +36,6 @@ typedef struct NODE{
     // Estrutura do usuário
     user UserNode;
 
-    int cont;
-
     // variável para verificar se o nó está ou não no arquivo criado pelo programa.
     int isOnFile;
 
@@ -116,16 +114,7 @@ void addUser(list *lista, user usuarioNode){
 // Imprimer lista (para debug).
 void printList(list *lista){
     for(node *I = lista->inicio; I!=NULL; I = I->proximo){
-        printf(
-        "ID: %d\nNome: %sUsuário: %sTipo: %s\nEndereço:\nRua %s, bairro %s, número %d, cep %d\n\n", 
-        I->UserNode.id, 
-        I->UserNode.nome, 
-        I->UserNode.usuario, 
-        I->UserNode.tipo, 
-        I->UserNode.endereco.rua, 
-        I->UserNode.endereco.bairro, 
-        I->UserNode.endereco.numero, 
-        I->UserNode.endereco.cep);
+        printf("ID: %d\nNome: %sUsuário: %sTipo: %s\nEndereço:\nRua %s, bairro %s, número %d, cep %d\n\n", I->UserNode.id, I->UserNode.nome, I->UserNode.usuario, I->UserNode.tipo, I->UserNode.endereco.rua, I->UserNode.endereco.bairro, I->UserNode.endereco.numero, I->UserNode.endereco.cep);
     }
 }
 
@@ -158,80 +147,111 @@ int main(){
     setlocale(LC_ALL, "portuguese");
 
     //Iniciando arquvos e listas.
+
     list *Lista = CreateList();
-    user rUser;// = (user*)malloc(1*sizeof(user));
 
-    FILE *usersDataBase = fopen("userDataBase.bin", "r+");
+    FILE *usersDataBase = fopen("userDataBase.bin", "rb");
 
-    if(usersDataBase == NULL){ // Lista vazia
-        usersDataBase = fopen("userDataBase.bin", "w+");
+    if(usersDataBase == NULL){ // Não foi possível abrir o arquivo.
+        usersDataBase = fopen("userDataBase.bin", "wb");
         if(usersDataBase!=NULL){// Arquivo criado com sucesso.
             printf("O==================================================================================O\n| A lista foi recém criada, sendo assim será necessário cadastrar o *SUPERUSUÁRIO* |\nO==================================================================================O");
             proxTela();
+            node superUser;
 
             // Dar Id ao *SUPERUSUÁRIO*.
-            rUser.id = idGenerator(Lista);
-            printf("O Id do *SUPERUSUÁRIO* é %d.\n", rUser.id);
+            superUser.UserNode.id = idGenerator(Lista);
+            printf("O Id do *SUPERUSUÁRIO* é %d.\n", superUser.UserNode.id);
 
             // Dar Nome ao *SUPERUSUÁRIO*.
             printf("\nInsira o nome do *SUPERUSUÁRIO*.\nR: ");
             setbuf(stdin, NULL);
-            fgets(rUser.nome, 128, stdin);
+            fgets(superUser.UserNode.nome, 128, stdin);
 
             // PEGAR ENDEREÇO DO *SUPERUSUÁRIO*:
             // Rua do *SUPERUSUÁRIO*
             printf("\nInsira a rua do *SUPERUSUÁRIO*.\nR: ");
             setbuf(stdin, NULL);
-            fgets(rUser.endereco.rua, 128, stdin);
+            fgets(superUser.UserNode.endereco.rua, 128, stdin);
 
             // Bairro do *SUPERSUÁRIO*
             printf("\nInsira o bairro do *SUPERUSUÁRIO*.\nR: ");
             setbuf(stdin, NULL);
-            fgets(rUser.endereco.bairro, 128, stdin);
+            fgets(superUser.UserNode.endereco.bairro, 128, stdin);
 
             // Número da casa do *SUPERSUÁRIO*
             printf("\nInsira o número da casa do *SUPERSUÁRIO*.\nR: ");
-            scanf("%d", &rUser.endereco.numero);
+            scanf("%d", &superUser.UserNode.endereco.numero);
 
             // CEP do *SUPERSUÁRIO*
             printf("\nInsira o CEP do *SUPERSUÁRIO*.\nR: ");
-            scanf("%d", &rUser.endereco.cep);
+            scanf("%d", &superUser.UserNode.endereco.cep);
             
             // Dar o parâmetro de login do *SUPERUSUÁRIO*.
             printf("\nInsira o Nick do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR: ");
             setbuf(stdin, NULL);
-            fgets(rUser.usuario, 64, stdin);
+            fgets(superUser.UserNode.usuario, 64, stdin);
 
             // Dar a senha para o login do *SUPERUSUÁRIO*
             printf("\nInsira a Senha do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR: ");
             setbuf(stdin, NULL);
-            fgets(rUser.senha, 64, stdin);
+            fgets(superUser.UserNode.senha, 64, stdin);
 
             //Definir o tipo de usuário (no caso, é fixo em *SUPERUSUÁRIO*).
-            printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).");
-            rUser.tipo = 'S';
+            printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).\n");
+            superUser.UserNode.tipo = 'S';
 
+            // Definindo que o *SUPERUSUÁRIO* estará no arquivo.
+            superUser.isOnFile = 1;
+            superUser.proximo = NULL;
+
+            printf("\nO *SUPERUSUÁRIO* foi cadastrado.\n");
+            printf("Id: %d\n", superUser.UserNode.id);
+            printf("Nome: %s", superUser.UserNode.nome);
+            printf("Bairro: %s", superUser.UserNode.endereco.bairro);
+            printf("Rua: %s", superUser.UserNode.endereco.rua);
+            printf("Número: %d\n", superUser.UserNode.endereco.numero);
+            printf("CEP: %d\n", superUser.UserNode.endereco.cep);
+            printf("Nick: %s", superUser.UserNode.usuario);
+            printf("Senha: %s", superUser.UserNode.senha);
+            printf("Tipo: %c\n", superUser.UserNode.tipo);
+
+            printf("\nInformações adicionais:\n");
+            printf("Usuário no arquivo == %d.\n", superUser.isOnFile);
+            printf("endereço do próximo usuário: %d.\n", superUser.proximo);
+    
             proxTela();
-            fwrite(&rUser, sizeof(user), 1, usersDataBase);
+
+            fwrite(&superUser, sizeof(node), 1, usersDataBase);
+            fclose(usersDataBase);
+
+            usersDataBase = fopen("userDataBase.bin", "rb");
         }else{
             printf("\nERRO: não foi possível criar/carregar o arquivo. adios.");
             proxTela();
             exit(1);
         }
-    }else{
-        printf("Arquivo já criado");
-
-        //pode ter coisa
-
-
     }
-
     
+    node rUser;
 
+    fread(&rUser, sizeof(node), 1, usersDataBase);
+
+            printf("\nO *SUPERUSUÁRIO* foi cadastrado.\n\nInformações:\n");
+            printf("Id: %d\n", rUser.UserNode.id);
+            printf("Nome: %s", rUser.UserNode.nome);
+            printf("Bairro: %s", rUser.UserNode.endereco.bairro);
+            printf("Rua: %s", rUser.UserNode.endereco.rua);
+            printf("Número: %d\n", rUser.UserNode.endereco.numero);
+            printf("CEP: %d\n", rUser.UserNode.endereco.cep);
+            printf("Nick: %s", rUser.UserNode.usuario);
+            printf("Senha: %s", rUser.UserNode.senha);
+            printf("Tipo: %c\n", rUser.UserNode.tipo);
+
+            printf("\nInformações adicionais:\n");
+            printf("Usuário no arquivo == %d.\n", rUser.isOnFile);
+            printf("endereço do próximo usuário: %d.\n", rUser.proximo);
     
-
-
-    fclose(usersDataBase);
     system("pause");
     return 0;
 }
