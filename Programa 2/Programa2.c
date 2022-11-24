@@ -113,6 +113,19 @@ void addUser(list *lista, node *usuarioNode){
 
 
 int loadListToMemo(list *lista, FILE *fileToLoad){
+    node *getUser = (node*)malloc(sizeof(node));
+    int cont=0;
+    do{
+        fread(getUser, sizeof(node), 1, fileToLoad);
+        addUser(lista, getUser);
+        cont++;
+    }while(fseek(fileToLoad, cont*sizeof(node), SEEK_SET)!=0);
+
+    if (lista->inicio!=NULL){
+        return 0; // Carregado com sucesso.
+    }else{
+        return 1; // Deu algum problema.
+    }
     
 }
 
@@ -241,21 +254,17 @@ int main(){
     
     printList(Lista);
 
-    if(loadListToMemo(Lista, usersDataBase)==1){
-        printf("\nOs nós salvos no arquivo foram carregados com sucesso.\n");
+    if(loadListToMemo(Lista, usersDataBase)==0){
+        printf("Os nós salvos no arquivo foram carregados com sucesso.\n");
     }else{
         printf("\nNão foi possível carregar os nós do arquivo para a memória\n");
         proxTela();
         exit(1);
     }
 
+    printList(Lista);
+
     
-
-    /*//Debug;
-    node rUser;
-
-    fread(&rUser, sizeof(node), 1, usersDataBase);
-    printuser(&rUser);*/
     
     system("pause");
     return 0;
