@@ -21,9 +21,9 @@ typedef struct{
 
 
 typedef struct{
-    // Dados obrigatï¿½rios da atividade
+    // Dados obrigatórios da atividade
     int id;
-    char nome[128]; // Desculpa professor, mas doia muito no coraï¿½ï¿½o colocar o tamanho das strings como 100 e 50... colocamos nï¿½meros que estï¿½o na base 2 (2^7==128 e 2^6==64).
+    char nome[128]; // Desculpa professor, mas doia muito no coração colocar o tamanho das strings como 100 e 50... colocamos números que estão na base 2 (2^7==128 e 2^6==64).
     char usuario[64];
     char senha[64];
     char tipo;
@@ -31,17 +31,17 @@ typedef struct{
 } user;
 
 
-// Estrutura de nï¿½ (node).
+// Estrutura de nó (node).
 typedef struct NODE{
-    // Estrutura do usuï¿½rio
+    // Estrutura do usuário
     user UserNode;
 
     int cont;
 
-    // variï¿½vel para verificar se o nï¿½ estï¿½ ou nï¿½o no arquivo criado pelo programa.
+    // variável para verificar se o nó está ou não no arquivo criado pelo programa.
     int isOnFile;
 
-    // Ponteiro que aponta para o endereï¿½o do prï¿½ximo nï¿½.
+    // Ponteiro que aponta para o endereço do próximo nó.
     struct NODE *proximo;
 } node;
 
@@ -54,7 +54,7 @@ typedef struct{
 
 
 /*------------------------------< Functions >------------------------------*/
-// Funï¿½ï¿½o estï¿½tica.
+// Função estética.
 void proxTela(){
     printf("\n\n");
     system("pause");
@@ -64,15 +64,15 @@ void proxTela(){
 
 
 list *CreateList(){
-    // Declara uma lista vazia dinï¿½micamente.
+    // Declara uma lista vazia dinâmicamente.
     list *lista = (list *)malloc(sizeof(list));
 
     // Verifica se a lista foi realmente criada.
-    if (lista == NULL){ // Caso haja erro, filaizarï¿½ o programa.
-        printf("\nErro ao alocar memï¿½ria para a lista.\n");
+    if (lista == NULL){ // Caso haja erro, filaizará o programa.
+        printf("\nErro ao alocar memória para a lista.\n");
 
         exit(1);
-    }else{ // Caso nï¿½o haja erro, o programa inicializa os elementos da lista como NULL (indica lista vazia).
+    }else{ // Caso não haja erro, o programa inicializa os elementos da lista como NULL (indica lista vazia).
         lista->inicio = NULL;
         lista->fim = NULL;
 
@@ -91,21 +91,21 @@ int idGenerator(list *lista){
 
 
 void addUser(list *lista, user usuarioNode){
-    //cria o node da lista dinï¿½mincamente.
+    //cria o node da lista dinâmincamente.
     node *NewUser = (node*)malloc(sizeof(node));
 
-    //Verifica se o nï¿½ foi criado com ï¿½xito.
+    //Verifica se o nó foi criado com êxito.
     if(NewUser == NULL){
-        printf("\nErro ao adicionar novo usuï¿½rio.\n");
+        printf("\nErro ao adicionar novo usuário.\n");
         proxTela();
-        exit(1);  //finaliza o programa retornando cï¿½digo de erro 1.
+        exit(1);  //finaliza o programa retornando código de erro 1.
     }else{
         // Inserindo elemento no inicio da lista.
         NewUser->UserNode = usuarioNode;
         NewUser->proximo = lista->inicio;
 
-        // Verificando se a lista estï¿½ vazia.
-        if(lista->inicio == NULL){ // Caso esteja vazia, o primeiro elemento tambï¿½m serï¿½ o ï¿½ltimo.
+        // Verificando se a lista está vazia.
+        if(lista->inicio == NULL){ // Caso esteja vazia, o primeiro elemento também será o último.
             lista->fim = NewUser;
         }
         lista->inicio = NewUser;
@@ -117,7 +117,7 @@ void addUser(list *lista, user usuarioNode){
 void printList(list *lista){
     for(node *I = lista->inicio; I!=NULL; I = I->proximo){
         printf(
-        "ID: %d\nNome: %sUsuï¿½rio: %sTipo: %s\nEndereï¿½o:\nRua %s, bairro %s, nï¿½mero %d, cep %d\n\n", 
+        "ID: %d\nNome: %sUsuário: %sTipo: %s\nEndereço:\nRua %s, bairro %s, número %d, cep %d\n\n", 
         I->UserNode.id, 
         I->UserNode.nome, 
         I->UserNode.usuario, 
@@ -132,23 +132,23 @@ void printList(list *lista){
 
 // Limpar a lista (apenas no final do programa).a
 int clearUers(list *lista){
-    if(lista == NULL || lista->inicio == NULL){ // Ou nï¿½o hï¿½ lista, ou a lista estï¿½ vazia.
+    if(lista == NULL || lista->inicio == NULL){ // Ou não há lista, ou a lista está vazia.
         return 0;
-    }else{ // Hï¿½ lista, e ela serï¿½ limpa.
+    }else{ // Há lista, e ela será limpa.
     node *atualUser;
 
-    //enquanto o inicio da lista apontar para um nï¿½
+    //enquanto o inicio da lista apontar para um nó
     while(lista->inicio != NULL){
             //recupera o primeiro elemento da lista
             atualUser = lista->inicio;
 
-            //faz com que o prï¿½ximo elemento seja o primeiro elemento da lista;
+            //faz com que o próximo elemento seja o primeiro elemento da lista;
             lista->inicio = atualUser->proximo;
 
             //remove o nodo da lista
             free(atualUser);
     }
-    //libera a memï¿½ria da variï¿½vel que representa a lista
+    //libera a memória da variável que representa a lista
     free(lista);
     }
     return 1;
@@ -166,56 +166,55 @@ int main(){
     if(usersDataBase == NULL){ // Lista vazia
         usersDataBase = fopen("userDataBase.bin", "w+");
         if(usersDataBase!=NULL){// Arquivo criado com sucesso.
-            printf("O==================================================================================O\n| A lista foi recï¿½m criada, sendo assim serï¿½ necessï¿½rio cadastrar o *SUPERUSUï¿½RIO* |\nO==================================================================================O");
+            printf("O==================================================================================O\n| A lista foi recém criada, sendo assim será necessário cadastrar o *SUPERUSUÁRIO* |\nO==================================================================================O");
             proxTela();
 
-            // Dar Id ao *SUPERUSUï¿½RIO*.
+            // Dar Id ao *SUPERUSUÁRIO*.
             rUser.id = idGenerator(Lista);
-            printf("O Id do *SUPERUSUï¿½RIO* ï¿½ %d.\n", rUser.id);
+            printf("O Id do *SUPERUSUÁRIO* é %d.\n", rUser.id);
 
-            // Dar Nome ao *SUPERUSUï¿½RIO*.
-            printf("\nInsira o nome do *SUPERUSUï¿½RIO*.\nR:");
+            // Dar Nome ao *SUPERUSUÁRIO*.
+            printf("\nInsira o nome do *SUPERUSUÁRIO*.\nR:");
             setbuf(stdin, NULL);
             fgets(rUser.nome, 128, stdin);
 
-            // PEGAR ENDEREï¿½O DO *SUPERUSUï¿½RIO*:
-            // Rua do *SUPERUSUï¿½RIO*
-            printf("\nInsira a rua do *SUPERUSUï¿½RIO*.\nR:");
+            // PEGAR ENDEREÇO DO *SUPERUSUÁRIO*:
+            // Rua do *SUPERUSUÁRIO*
+            printf("\nInsira a rua do *SUPERUSUÁRIO*.\nR:");
             setbuf(stdin, NULL);
             fgets(rUser.endereco.rua, 128, stdin);
 
-            // Bairro do *SUPERSUï¿½RIO*
-            printf("\nInsira o bairro do *SUPERUSUï¿½RIO*.\nR:");
+            // Bairro do *SUPERSUÁRIO*
+            printf("\nInsira o bairro do *SUPERUSUÁRIO*.\nR:");
             setbuf(stdin, NULL);
             fgets(rUser.endereco.bairro, 128, stdin);
 
-            // Nï¿½mero da casa do *SUPERSUï¿½RIO*
-            printf("\nInsira o nï¿½mero da casa do *SUPERSUï¿½RIO*.\nR:");
+            // Número da casa do *SUPERSUÁRIO*
+            printf("\nInsira o número da casa do *SUPERSUÁRIO*.\nR:");
             scanf("%d", &rUser.endereco.numero);
 
-            // CEP do *SUPERSUï¿½RIO*
-            printf("\nInsira o CEP do *SUPERSUï¿½RIO*.\nR:");
+            // CEP do *SUPERSUÁRIO*
+            printf("\nInsira o CEP do *SUPERSUÁRIO*.\nR:");
             scanf("%d", &rUser.endereco.cep);
             
-            // Dar o parï¿½metro de login do *SUPERUSUï¿½RIO*.
-            printf("\nInsira o Nick do *SUPERUSUï¿½RIO* (parï¿½metro para fazer o login).\nR:");
+            // Dar o parâmetro de login do *SUPERUSUÁRIO*.
+            printf("\nInsira o Nick do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR:");
             setbuf(stdin, NULL);
             fgets(rUser.usuario, 64, stdin);
 
-            // Dar a senha para o login do *SUPERUSUï¿½RIO*
-            printf("\nInsira a Senha do *SUPERUSUï¿½RIO* (parï¿½metro para fazer o login).\nR:");
+            // Dar a senha para o login do *SUPERUSUÁRIO*
+            printf("\nInsira a Senha do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR:");
             setbuf(stdin, NULL);
             fgets(rUser.senha, 64, stdin);
 
-            //Definir o tipo de usuï¿½rio (no caso, ï¿½ fixo em *SUPERUSUï¿½RIO*).
-            printf("\nO *SUPERUSUï¿½RIO* recebe o tipo S (*SUPERUSUï¿½RIO*).\n");
+            //Definir o tipo de usuário (no caso, é fixo em *SUPERUSUÁRIO*).
+            printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).\n");
             rUser.tipo = 'S';
-            
-            proxTela();
+
 
             fwrite(&rUser, sizeof(user), 1, usersDataBase);
         }else{
-            printf("\nERRO: nï¿½o foi possï¿½vel criar/carregar o arquivo. \"adios\".");
+            printf("\nERRO: não foi possível criar/carregar o arquivo. adios.");
             proxTela();
             exit(1);
         }
@@ -223,7 +222,7 @@ int main(){
 
         
     }else{
-        printf("Arquivo jï¿½ criado");
+        printf("Arquivo já criado");
 
         //pode ter coisa
 
