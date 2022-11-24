@@ -174,53 +174,50 @@ int main(){
             printf("O Id do *SUPERUSUÁRIO* é %d.\n", rUser.id);
 
             // Dar Nome ao *SUPERUSUÁRIO*.
-            printf("\nInsira o nome do *SUPERUSUÁRIO*.\nR:");
+            printf("\nInsira o nome do *SUPERUSUÁRIO*.\nR: ");
             setbuf(stdin, NULL);
             fgets(rUser.nome, 128, stdin);
 
             // PEGAR ENDEREÇO DO *SUPERUSUÁRIO*:
             // Rua do *SUPERUSUÁRIO*
-            printf("\nInsira a rua do *SUPERUSUÁRIO*.\nR:");
+            printf("\nInsira a rua do *SUPERUSUÁRIO*.\nR: ");
             setbuf(stdin, NULL);
             fgets(rUser.endereco.rua, 128, stdin);
 
             // Bairro do *SUPERSUÁRIO*
-            printf("\nInsira o bairro do *SUPERUSUÁRIO*.\nR:");
+            printf("\nInsira o bairro do *SUPERUSUÁRIO*.\nR: ");
             setbuf(stdin, NULL);
             fgets(rUser.endereco.bairro, 128, stdin);
 
             // Número da casa do *SUPERSUÁRIO*
-            printf("\nInsira o número da casa do *SUPERSUÁRIO*.\nR:");
+            printf("\nInsira o número da casa do *SUPERSUÁRIO*.\nR: ");
             scanf("%d", &rUser.endereco.numero);
 
             // CEP do *SUPERSUÁRIO*
-            printf("\nInsira o CEP do *SUPERSUÁRIO*.\nR:");
+            printf("\nInsira o CEP do *SUPERSUÁRIO*.\nR: ");
             scanf("%d", &rUser.endereco.cep);
             
             // Dar o parâmetro de login do *SUPERUSUÁRIO*.
-            printf("\nInsira o Nick do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR:");
+            printf("\nInsira o Nick do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR: ");
             setbuf(stdin, NULL);
             fgets(rUser.usuario, 64, stdin);
 
             // Dar a senha para o login do *SUPERUSUÁRIO*
-            printf("\nInsira a Senha do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR:");
+            printf("\nInsira a Senha do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR: ");
             setbuf(stdin, NULL);
             fgets(rUser.senha, 64, stdin);
 
             //Definir o tipo de usuário (no caso, é fixo em *SUPERUSUÁRIO*).
-            printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).\n");
+            printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).");
             rUser.tipo = 'S';
 
-
+            proxTela();
             fwrite(&rUser, sizeof(user), 1, usersDataBase);
         }else{
             printf("\nERRO: não foi possível criar/carregar o arquivo. adios.");
             proxTela();
             exit(1);
         }
-       
-
-        
     }else{
         printf("Arquivo já criado");
 
