@@ -27,21 +27,21 @@ Programa 2.
 
   > Existe apenas um superusuário no sistema e ele deve ser inserido no início do arquivo.
   
-    >>> Ao iniciar o programa, o sistema cria a lista (com os dados do arquivo), e dependendo dos casos:
+    >>> Ao iniciar o programa, o sistema cria a lista (com os dados do arquivo) e dependendo dos casos:
     
       >-> caso o arquivo exista (caso o arquivo exista o superusuário será um entre os outros
       nós cadastrados).
       
       >-> Caso o arquivo não exista, o sistema pede que o usuário cadastre primeiramente os dados do
       superusuário.
-            O superusuário é então colocado na lista e também gravado no arquivo. Esse usuário terá 
-      o privilégio de poder cadastrar Administradores para o sistema, além de fazer tudo o que um 
+            O superusuário é então colocado na lista e também gravado no arquivo. Esse usuário terá
+      o privilégio de poder cadastrar Administradores para o sistema, além de fazer tudo o que um
       administrador faz.
 
 
   > Logo após criar a lista como mostrado acima, o sistema parte para um menu inicial (menu de login). 
  
-    >>> Todo usuário deve estar logado no sistema para que novos menus sejam exibidos. 
+    >>> Todo usuário deve estar logado no sistema para que novos menus sejam exibidos.
       Para isso, primeiramente crie um menu com apenas duas opções:
         1- Login;
         2- Sair.
@@ -50,11 +50,10 @@ Programa 2.
       1- Login:
               Ao escolher a opção login, o sistema verifica se o usuário e a senha estão corretos:
               >-> Caso estejam incorretos, o sistema deve mostrar a mensagem 
-              “usuário e/ou senha inválidos.”
-              e logo depois retornar para o menu anterior.
+                “usuário e/ou senha inválidos." e logo depois retornar para o menu anterior.
               
               >-> Caso o usuário digite suas credenciais (usuário e senha) corretamente, 
-              um novo menu deve ser exibido de acordo com o tipo do usuário:
+                um novo menu deve ser exibido de acordo com o tipo do usuário:
                    --> Se o usuário for o superusuário ou Administrador, deve-se apresentar o seguinte
                    menu:
                           1- Cadastrar Usuário;
@@ -83,12 +82,12 @@ Programa 2.
               >-> Caso seja escolhido N, os dados são mantidos apenas na lista ligada.
             
             
-          >>> A senha não deve ser armazenada como um texto em claro (texto sem criptografia) por
-          medidas de segurança. 
+          >>> A senha não deve ser armazenada como um texto em claro (texto sem criptografia)
+          por medidas de segurança. 
     **Mais informações sobre como trabalhar com a senha são dadas mais a frente;
           
-          >>> O ID é sempre único e, portanto, ao cadastrar um usuário ele deve ser o próximo disponível 
-          (o próximo que não foi utilizado por nenhum nó da lista).
+          >>> O ID é sempre único e, portanto, ao cadastrar um usuário ele deve ser o próximo
+            disponível (o próximo que não foi utilizado por nenhum nó da lista).
           
           >>> Apenas o superusuário pode inserir Administradores;
           
@@ -96,20 +95,20 @@ Programa 2.
           
           
       2. Remover Usuário:
-          >>> O usuário deve digitar o ID que deseja remover;
+          >>> O usuário deve digitar o ID que deseja remover.
           
-          >>> Se o ID existir e o perfil do usuário permitir que ele faça tal remoção, o usuário deve
-          ser removido da lista e também do arquivo e uma mensagem “usuário removido com sucesso" deve 
-          aparecer;
+          >>> Se o ID existir e o perfil do usuário permitir que ele faça tal remoção, o
+            usuário deve ser removido da lista e também do arquivo e uma mensagem 
+            “usuário removido com sucesso" deve aparecer.
           
-          >>> Se o ID não existir o sistema deve apresentar a mensagem “usuário inexistente.”;
+          >>> Se o ID não existir o sistema deve apresentar a mensagem “usuário inexistente.”;.
           
-          >>> Se o perfil do usuário não permitir a remoção deve-se apresentar a mensagem 
-              “você não pode remover esse usuário.”;
+          >>> Se o perfil do usuário não permitir a remoção deve-se apresentar a mensagem
+            “você não pode remover esse usuário.”.
           
-          >>> O superusuário não pode ser removido;
+          >>> O superusuário não pode ser removido.
           
-          >>> Apenas Administradores e o superusuário podem remover clientes;
+          >>> Apenas Administradores e o superusuário podem remover clientes.
           
           >>> Apenas o superusuário pode remover administradores.
           
@@ -118,7 +117,7 @@ Programa 2.
           >>> O nome do usuário deve ser digitado;
           
           >>> Caso exista, os dados do usuário devem ser apresentados. Caso contrário, 
-          apresenta a mensagem “usuário não encontrado.”. 
+            apresenta a mensagem “usuário não encontrado.”. 
 
 
 
