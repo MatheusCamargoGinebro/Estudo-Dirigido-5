@@ -153,16 +153,15 @@ int clearUers(list *lista){
 
 /*-------------< Funções de exibição e locomoção na lista/arquivo >-------------*/
 int verifLogin(list *Lista, user *atualUser){
-    int verif;
+    int verif = -1;
     for(node *I = Lista->inicio; I!=NULL; I = I->proximo){
         if(strcmp(atualUser->usuario, I->UserNode.usuario)==0){
-            verif = 1;
+            verif = 1; // Usuário verificado
             if(strcmp(atualUser->senha, I->UserNode.senha)==0){
-                verif = 0;
+                verif = 0; // Senha verificada
+
+                *atualUser = I->UserNode;
             } 
-        }
-        else{
-            verif=-1;
         }
     }
     return verif; 
@@ -316,11 +315,12 @@ int main(){
                         setbuf(stdin, NULL);
                         fgets(atualUser->senha, 64, stdin);
 
-                        // Criando um variável de verificação e testando o login do usuário.
+                        // Passando o resultado da função para uma variável de verificação.
                         verif = verifLogin(Lista, atualUser);
-
+                        
                         if(verif == 0){
                             printf("Usuário e senha corretos.");
+
                         }else if(verif == 1){
                             printf("Usuário correto, senha inválida.");
                             proxTela();
