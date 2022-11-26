@@ -1,5 +1,5 @@
 # Estudo-dirigido-5
-Repositório do estudo dirigido 5. (atividade da aula de ILG)
+Repositório do estudo dirigido 5 (atividade da aula de ILG).
 
 
   Este repositório serve para guardar o estudo dirigido 5, que é uma atividade da disciplina de ILG - Lógica e Técnicas de Programação, 
