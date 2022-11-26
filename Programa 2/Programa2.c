@@ -300,8 +300,7 @@ int main(){
                     // Reservando um espaço na memória para o usuário atual, de forma dinâmica.
                     user *atualUser = (user*)malloc(sizeof(user));
                     int verif;
-                    do
-                    {
+                    do{
                         system("cls");
                         printf("O===========================O\n| Você escolheu fazer login |\nO===========================O\n\n");
                     
@@ -311,7 +310,7 @@ int main(){
                         fgets(atualUser->usuario, 64, stdin);
 
                         // Pegando a senha do usuário.
-                        printf("Digite sua senha de usuário.\nR: ");
+                        printf("\nDigite sua senha de usuário.\nR: ");
                         setbuf(stdin, NULL);
                         fgets(atualUser->senha, 64, stdin);
 
@@ -319,19 +318,100 @@ int main(){
                         verif = verifLogin(Lista, atualUser);
                         
                         if(verif == 0){
-                            printf("Usuário e senha corretos.");
+                            printf("\nUsuário e senha corretos.\n\nlogado com sucesso!\n\nVocê logou como %s", atualUser->usuario);
+                            proxTela();
+                            int rOpc;
+                                
+                            switch (atualUser->tipo)
+                            {
+                                case 'C': // Caso o usuário seja um cliente.
+                                do{
+                                    system("cls");
+                                    printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Alterar senha.                |\t\t\tTipo: %c\n|    [2] Sair.                         |\nO======================================O\n\nR:", atualUser->nome, atualUser->usuario, atualUser->tipo);
+                                    scanf("%d", &rOpc);
+
+                                    switch (rOpc){
+                                        case 1:
+                                            system("cls");
+                                            printf("O====================================O\n");
+                                            printf("| Você escolheu [1] alretar a senha. |\n");
+                                            printf("O====================================O\n");
+                                        break;
+                                        
+                                        case 2:
+                                            system("cls");
+                                            printf("O=============================O\n");
+                                            printf("| Você escolheu [2] deslogar. |\n");
+                                            printf("O=============================O\n");
+                                        break;
+                                        default:
+                                            printf("Opção inválida. escolha apenas entre 1 e 2");
+                                        break;
+                                    }
+                                    proxTela();
+                                }while(rOpc!=2);
+                                break;
+                        
+                                default: // Caso o usuário seja o *SUPERUSUÁRIO* ou um Administrador.
+                                do
+                                {
+                                    system("cls");
+                                    printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Cadastrar usuário.            |\t\t\tTipo: %c\n|    [2] Remover usuário.              |\n|    [3] Pesquisar usuário por nome.   |\n|    [4] Alterar senha.                |\n|    [5] Sair.                         |\nO======================================O\n\nR:", atualUser->nome, atualUser->usuario, atualUser->tipo);
+                                    scanf("%d", &rOpc);
+
+                                    switch (rOpc){
+                                        case 1:
+                                            system("cls");
+                                            printf("O======================================O\n");
+                                            printf("| Você escolheu [1] Cadastrar usuário. |\n");
+                                            printf("O======================================O\n");
+                                        break;
+
+                                        case 2:
+                                            system("cls");
+                                            printf("O=======================================O\n");
+                                            printf("| Você escolheu [2] Remover um usuário. |\n");
+                                            printf("O=======================================O\n");
+                                        break;
+
+                                        case 3:
+                                            system("cls");
+                                            printf("O===============================================O\n");
+                                            printf("| Você escolheu [3] Pesquisar usuário por nome. |\n");
+                                            printf("O===============================================O\n");
+                                        break;
+
+                                        case 4:
+                                            system("cls");
+                                            printf("O==================================O\n");
+                                            printf("| Você escolheu [4] Alterar senha. |\n");
+                                            printf("O==================================O\n");
+                                        break;
+                                        
+                                        case 5:
+                                            system("cls");
+                                            printf("O=============================O\n");
+                                            printf("| Você escolheu [5] deslogar. |\n");
+                                            printf("O=============================O\n");
+                                        break;
+                                        default:
+                                            printf("\nOpção inválida. escolha apenas entre 1 e 2.");
+                                        break;
+                                    }
+                                    proxTela();
+                                } while(rOpc!=5);
+                                break;
+                            }
+                            
 
                         }else if(verif == 1){
-                            printf("Usuário correto, senha inválida.");
+                            printf("\nUsuário correto, senha inválida.");
                             proxTela();
                         }else{
-                            printf("Não foi possível encontrar o usuário.");
+                            printf("\nNão foi possível encontrar o usuário.");
                             proxTela();
                         }
                     }while(verif != 0);
-
-                    printf("passou");
-                    proxTela();
                 break;
 
                 case 2:
@@ -352,13 +432,6 @@ int main(){
             }
             proxTela();
         } while (rLog!=2);
-        
-
     }
-
-    
-    
-    
-    system("pause");
     return 0;
 }
