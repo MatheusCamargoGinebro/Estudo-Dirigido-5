@@ -52,14 +52,14 @@ typedef struct{
 
 
 /*------------------------------< Functions >------------------------------*/
+
+/*-------------< Funções de modificação de lista/arquivo >-------------*/
 // Função estética.
 void proxTela(){
     printf("\n\n");
     system("pause");
     system("cls");
 }
-
-
 
 list *CreateList(){
     // Declara uma lista vazia dinâmicamente.
@@ -77,16 +77,6 @@ list *CreateList(){
         return lista;
     }
 }
-
-int idGenerator(list *lista){
-    int cont=0;
-    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
-        cont++;
-    }
-    return cont;
-}
-
-
 
 void addUser(list *lista, node *usuarioNode){
     //cria o node da lista dinâmincamente.
@@ -110,6 +100,13 @@ void addUser(list *lista, node *usuarioNode){
     }
 }
 
+int idGenerator(list *lista){
+    int cont=0;
+    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
+        cont++;
+    }
+    return cont;
+}
 
 
 int loadListToMemo(list *lista, FILE *fileToLoad){
@@ -128,27 +125,6 @@ int loadListToMemo(list *lista, FILE *fileToLoad){
     }
     
 }
-
-
-
-// Imprimer lista (para debug).
-void printuser(node *userToPrint){
-        printf("Id: %d\n", userToPrint->UserNode.id);
-        printf("Nome: %s", userToPrint->UserNode.nome);
-        printf("Bairro: %s", userToPrint->UserNode.endereco.bairro);
-        printf("Rua: %s", userToPrint->UserNode.endereco.rua);
-        printf("Número: %d\n", userToPrint->UserNode.endereco.numero);
-        printf("CEP: %d\n", userToPrint->UserNode.endereco.cep);
-        printf("Usuário: %s", userToPrint->UserNode.usuario);
-        printf("Senha: %s", userToPrint->UserNode.senha);
-        printf("Tipo: %c\n", userToPrint->UserNode.tipo);
-}
-void printList(list *lista){
-    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
-        printuser(I);
-    }
-}
-
 /*
 // Limpar a lista (apenas no final do programa).a
 int clearUers(list *lista){
@@ -175,6 +151,28 @@ int clearUers(list *lista){
 }*/
 
 
+/*-------------< Funções de exibição e locomoção na lista/arquivo >-------------*/
+// Imprimer lista (para debug).
+void printuser(node *userToPrint){
+    printf("Id: %d\n", userToPrint->UserNode.id);
+    printf("Nome: %s", userToPrint->UserNode.nome);
+    printf("Bairro: %s", userToPrint->UserNode.endereco.bairro);
+    printf("Rua: %s", userToPrint->UserNode.endereco.rua);
+    printf("Número: %d\n", userToPrint->UserNode.endereco.numero);
+    printf("CEP: %d\n", userToPrint->UserNode.endereco.cep);
+    printf("Usuário: %s", userToPrint->UserNode.usuario);
+    printf("Senha: %s", userToPrint->UserNode.senha);
+    printf("Tipo: %c\n", userToPrint->UserNode.tipo);
+}
+void printList(list *lista){
+    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
+        printuser(I);
+    }
+}
+
+
+
+
 
 /*------------------------------< Main >------------------------------*/
 int main(){
@@ -185,14 +183,12 @@ int main(){
 
     FILE *usersDataBase = fopen("userDataBase.bin", "rb");
 
-    if(usersDataBase == NULL){ // Não foi possível abrir o arquivo.
-
+    if(usersDataBase == NULL){ // Não foi possível abrir o arquivo. (tentará criar outro arquivo).
         usersDataBase = fopen("userDataBase.bin", "wb");
         if(usersDataBase!=NULL){// Arquivo criado com sucesso.
             node *superUser = (node*)malloc(sizeof(node));
             printf("O==================================================================================O\n| A lista foi recém criada, sendo assim será necessário cadastrar o *SUPERUSUÁRIO* |\nO==================================================================================O");
             proxTela();
-
 
             // Dar Id ao *SUPERUSUÁRIO*.
             superUser->UserNode.id = idGenerator(Lista);
@@ -233,7 +229,7 @@ int main(){
             fgets(superUser->UserNode.senha, 64, stdin);
 
             //Definir o tipo de usuário (no caso, é fixo em *SUPERUSUÁRIO*).
-            printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).\n");
+            printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).");
             superUser->UserNode.tipo = 'S';
 
             // Definindo que o *SUPERUSUÁRIO* estará no arquivo.
@@ -241,28 +237,81 @@ int main(){
     
             proxTela();
 
+            // Insere o *SUPERUSUÁRIO* na lista.
             fwrite(superUser, sizeof(node), 1, usersDataBase);
+            // Salva a lista.
             fclose(usersDataBase);
+            // Libera a memória usada para guardar os dados do *SUPERUSUÁRIO*.
             free(superUser);
+            // Abre a lista novamente, desta vez em modo de leitura.
             usersDataBase = fopen("userDataBase.bin", "rb");
+
+            if(usersDataBase == NULL){
+                printf("O Super usuário foi salvo, porém não foi possível abrir o arquivo em modo leitura.\n");
+                proxTela();
+                exit(1);
+            }
         }else{
             printf("\nERRO: não foi possível criar/carregar o arquivo. adios.");
             proxTela();
             exit(1);
         }
     }
-    
-    printList(Lista);
 
-    if(loadListToMemo(Lista, usersDataBase)==0){
-        printf("Os nós salvos no arquivo foram carregados com sucesso.\n");
-    }else{
-        printf("\nNão foi possível carregar os nós do arquivo para a memória\n");
+    // Carregando dados dos usuários para a lista.
+    if(loadListToMemo(Lista, usersDataBase)!=0){
+        printf("O============================================================O\n| Não foi possível carregar os nós do arquivo para a memória |\nO============================================================O");
         proxTela();
         exit(1);
+    }else{
+        printf("O========================================================O\n| Os nós salvos no arquivo foram carregados com sucesso. |\nO========================================================O");
+        proxTela();
+
+        int rLog; // Variável de resposta para login.
+        user atualUserLog;
+
+        do
+        {
+            printf("O=============================O\n");
+            printf("| Sistema de Login e arquivos |\n");
+            printf("O=============================O\n");
+            printf("|     O que deseja fazer?     |\n");
+            printf("|          [1] Login.         |\n");
+            printf("|          [2] Sair.          |\n");
+            printf("O=============================O\n\nR: ");
+            scanf("%d", &rLog);
+
+            switch (rLog){
+                case 1:
+                    system("cls");
+                        
+                break;
+
+                case 2:
+                    printf("\nVocê escolheu sair do programa. tenha um bom dia!");
+                break;
+
+                case 3: // Debug.
+                    system("cls");
+                    printf("O===================O\n| Opção 3: DEBUG :D |\nO===================O\n\nOs usuários que estão na lista:\n\n");
+                    
+                    printList(Lista);
+                    proxTela;
+                break;
+            
+                default:
+                printf("\nOpção inválida. tente escolher entre 1 e 2.");
+                break;
+            }
+            proxTela();
+        } while (rLog!=2);
+        
+
     }
 
-    printList(Lista);
+    
+
+    
 
     
     
