@@ -152,6 +152,27 @@ int clearUers(list *lista){
 
 
 /*-------------< Funções de exibição e locomoção na lista/arquivo >-------------*/
+int verifLogin(list *Lista, user *atualUser){
+    int verif;
+    for(node *I = Lista->inicio; I!=NULL; I = I->proximo){
+        if(strcmp(atualUser->usuario, I->UserNode.usuario)==0){
+            verif = 1;
+            if(strcmp(atualUser->senha, I->UserNode.senha)==0){
+                verif = 0;
+            } 
+        }
+        else{
+            verif=-1;
+        }
+    }
+    return verif; 
+    /*      Gabarito do return (verif):
+        return 1 == Usuário encontrado, senha inválida.
+        return 0 == usuário e senha corretos.
+        return -1 == não foi encontrado usuário.
+    */
+}
+
 // Imprimer lista (para debug).
 void printuser(node *userToPrint){
     printf("Id: %d\n", userToPrint->UserNode.id);
@@ -268,23 +289,49 @@ int main(){
         proxTela();
 
         int rLog; // Variável de resposta para login.
-        user atualUserLog;
 
         do
         {
-            printf("O=============================O\n");
-            printf("| Sistema de Login e arquivos |\n");
-            printf("O=============================O\n");
-            printf("|     O que deseja fazer?     |\n");
-            printf("|          [1] Login.         |\n");
-            printf("|          [2] Sair.          |\n");
-            printf("O=============================O\n\nR: ");
+            printf("O=============================O\n| Sistema de Login e arquivos |\nO=============================O\n|     O que deseja fazer?     |\n|          [1] Login.         |\n|          [2] Sair.          |\nO=============================O\n\nR: ");
             scanf("%d", &rLog);
 
             switch (rLog){
                 case 1:
-                    system("cls");
-                        
+                printf("a");
+                    // Reservando um espaço na memória para o usuário atual, de forma dinâmica.
+                    user *atualUser = (user*)malloc(sizeof(user));
+                    int verif;
+                    do
+                    {
+                        system("cls");
+                        printf("O===========================O\n| Você escolheu fazer login |\nO===========================O\n\n");
+                    
+                        // Pegando o nome do usuário.
+                        printf("Digite seu de usuário.\nR: ");
+                        setbuf(stdin, NULL);
+                        fgets(atualUser->usuario, 64, stdin);
+
+                        // Pegando a senha do usuário.
+                        printf("Digite sua senha de usuário.\nR: ");
+                        setbuf(stdin, NULL);
+                        fgets(atualUser->senha, 64, stdin);
+
+                        // Criando um variável de verificação e testando o login do usuário.
+                        verif = verifLogin(Lista, atualUser);
+
+                        if(verif == 0){
+                            printf("Usuário e senha corretos.");
+                        }else if(verif == 1){
+                            printf("Usuário correto, senha inválida.");
+                            proxTela();
+                        }else{
+                            printf("Não foi possível encontrar o usuário.");
+                            proxTela();
+                        }
+                    }while(verif != 0);
+
+                    printf("passou");
+                    proxTela();
                 break;
 
                 case 2:
@@ -310,9 +357,6 @@ int main(){
     }
 
     
-
-    
-
     
     
     system("pause");
