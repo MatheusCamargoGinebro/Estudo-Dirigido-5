@@ -113,37 +113,25 @@ int idGenerator(list *lista){
 int loadListToMemo(list *lista, FILE *fileToLoad){
     node *getUser = (node*)malloc(sizeof(node));
     int cont=1;
-
+    
     do{
         fseek(fileToLoad, -cont*sizeof(node), SEEK_END);
         fread(getUser, sizeof(node), 1, fileToLoad);
-
-        printf("Id: %d\n", getUser->UserNode.id);
-        printf("Nome: %s", getUser->UserNode.nome);
-        printf("Bairro: %s", getUser->UserNode.endereco.bairro);
-        printf("Rua: %s", getUser->UserNode.endereco.rua);
-        printf("Número: %d\n", getUser->UserNode.endereco.numero);
-        printf("CEP: %d\n", getUser->UserNode.endereco.cep);
-        printf("Usuário: %s", getUser->UserNode.usuario);
-        printf("Senha: %s", getUser->UserNode.senha);
-        printf("Tipo: %c\n\n", getUser->UserNode.tipo);
 
         node *newUser = (node*)malloc(sizeof(node));
 
         newUser->UserNode = getUser->UserNode;
         newUser->isOnFile = getUser->isOnFile;
 
-
         addUser(lista, newUser);
         cont++;
     }while(getUser->UserNode.tipo!='S');
-
+    
     if (lista->inicio!=NULL){
         return 0; // Carregado com sucesso.
     }else{
         return 1; // Deu algum problema.
     }
-    
 }
 
 void addUserToFile(FILE *fileToAdd, list *Lista, node *NewUser){
@@ -210,7 +198,8 @@ void printuser(node *userToPrint){
     printf("CEP: %d\n", userToPrint->UserNode.endereco.cep);
     printf("Usuário: %s", userToPrint->UserNode.usuario);
     printf("Senha: %s", userToPrint->UserNode.senha);
-    printf("Tipo: %c\n\n", userToPrint->UserNode.tipo);
+    printf("Tipo: %c\n", userToPrint->UserNode.tipo);
+    printf("Salvo no arquivo == %d.\n\n", userToPrint->isOnFile);
 }
 void printList(list *lista){
     for(node *I = lista->inicio; I!=NULL; I = I->proximo){
@@ -329,224 +318,234 @@ int main(){
                     // Reservando um espaço na memória para o usuário atual, de forma dinâmica.
                     user *atualUser = (user*)malloc(sizeof(user));
                     int verif;
-                    do{
-                        system("cls");
-                        printf("O===========================O\n| Você escolheu fazer login |\nO===========================O\n\n");
+
+                    system("cls");
+                    printf("O===========================O\n| Você escolheu fazer login |\nO===========================O\n\n");
+                
+                    // Pegando o nome do usuário.
+                    printf("Digite seu nome de usuário.\nR: ");
+                    setbuf(stdin, NULL);
+                    fgets(atualUser->usuario, 64, stdin);
+
+                    // Pegando a senha do usuário.
+                    printf("\nDigite sua senha.\nR: ");
+                    setbuf(stdin, NULL);
+                    fgets(atualUser->senha, 64, stdin);
+
+                    // Passando o resultado da função para uma variável de verificação.
+                    verif = verifLogin(Lista, atualUser);
                     
-                        // Pegando o nome do usuário.
-                        printf("Digite seu nome de usuário.\nR: ");
-                        setbuf(stdin, NULL);
-                        fgets(atualUser->usuario, 64, stdin);
-
-                        // Pegando a senha do usuário.
-                        printf("\nDigite sua senha.\nR: ");
-                        setbuf(stdin, NULL);
-                        fgets(atualUser->senha, 64, stdin);
-
-                        // Passando o resultado da função para uma variável de verificação.
-                        verif = verifLogin(Lista, atualUser);
-                        
-                        if(verif == 0){
-                            printf("\nUsuário e senha corretos.\n\nlogado com sucesso!\n\nVocê logou como %s", atualUser->usuario);
-                            proxTela();
-                            int rOpc;
-                                
-                            switch (atualUser->tipo)
-                            {
-                                case 'C': // Caso o usuário seja um cliente.
-                                do{
-                                    system("cls");
-                                    printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Alterar senha.                |\t\t\tTipo: %c\n|    [2] Sair.                         |\nO======================================O\n\nR: ", atualUser->nome, atualUser->usuario, atualUser->tipo);
-                                    scanf("%d", &rOpc);
-
-                                    switch (rOpc){
-                                        case 1:
-                                            system("cls");
-                                            printf("O====================================O\n");
-                                            printf("| Você escolheu [1] alretar a senha. |\n");
-                                            printf("O====================================O\n");
-                                        break;
-                                        
-                                        case 2:
-                                            system("cls");
-                                            printf("O=============================O\n");
-                                            printf("| Você escolheu [2] deslogar. |\n");
-                                            printf("O=============================O\n");
-                                        break;
-                                        default:
-                                            printf("Opção inválida. escolha apenas entre 1 e 2");
-                                        break;
-                                    }
-                                    proxTela();
-                                }while(rOpc!=2);
-                                break;
-                        
-                                default: // Caso o usuário seja o *SUPERUSUÁRIO* ou um Administrador.
-                                do
-                                {
-                                    system("cls");
-                                    printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Cadastrar usuário.            |\t\t\tTipo: %c\n|    [2] Remover usuário.              |\n|    [3] Pesquisar usuário por nome.   |\n|    [4] Alterar senha.                |\n|    [5] Sair.                         |\nO======================================O\n\nR: ", atualUser->nome, atualUser->usuario, atualUser->tipo);
-                                    scanf("%d", &rOpc);
-
-                                    switch (rOpc){
-                                        case 1:
-                                            system("cls");
-                                            printf("O======================================O\n| Você escolheu [1] Cadastrar usuário. |\nO======================================O\n");
-
-                                            node *novoUsuario = (node*)malloc(sizeof(node));
-                                            int verif2;
-                                            
-                                            // pegar ID do novo usuário.
-                                            novoUsuario->UserNode.id = idGenerator(Lista);
-
-                                            // Pegar nome do novo usuário.
-                                            printf("\nDigite o nome do usuário que você quer adicionar.\nR: ");
-                                            setbuf(stdin, NULL);
-                                            fgets(novoUsuario->UserNode.nome, 128, stdin);
-
-                                            // Pegar dados de ENDEREÇO.
-                                            // Rua do novo usuário.
-                                            printf("\nDigite a rua do usuário que você quer adicionar.\nR: ");
-                                            setbuf(stdin, NULL);
-                                            fgets(novoUsuario->UserNode.endereco.rua, 128, stdin);
-
-                                            // Bairro do novo usuário.
-                                            printf("\nDigite o bairro no usuário que você quer adicionar.\nR: ");
-                                            setbuf(stdin, NULL);
-                                            fgets(novoUsuario->UserNode.endereco.bairro, 128, stdin);
-
-                                            // Número do novo usuário.
-                                            printf("\nDigite o número do usuário que você quer adicionar.\nR: ");
-                                            scanf("%d", &novoUsuario->UserNode.endereco.numero);
-
-                                            // Cep do novo usuário.
-                                            printf("\nDigite o CEP do usuário que você quer adicionar.\nR: ");
-                                            scanf("%d", &novoUsuario->UserNode.endereco.cep);
-
-                                            // Nick de usuário.
-                                            do{
-                                                printf("\nDigite o nick do usuário (parâmetro de login).\nR: ");
-                                                setbuf(stdin, NULL);
-                                                fgets(novoUsuario->UserNode.usuario, 64, stdin);
-
-                                                verif2 = verifLogin(Lista, novoUsuario);
-                                                if(verif2 == 1 || verif2 == 0){
-                                                    printf("\nUsuário já cadastrado. tente outro nick.");
-                                                }
-                                            }while(verif2!=-1);
-                                            
-                                            // Senha do usuário.
-                                            printf("\nDigite a senha do usuário que você quer adicionar.\nR: ");
-                                            setbuf(stdin, NULL);
-                                            fgets(novoUsuario->UserNode.senha, 64, stdin);
-
-                                            // Tipo de usuário.
-                                            do{
-                                                printf("\nDigite o tipo de usuário.\nR: ");
-                                                setbuf(stdin, NULL);
-                                                scanf("%c", &novoUsuario->UserNode.tipo);
-
-                                                if(atualUser->tipo == 'S'){
-                                                    if(novoUsuario->UserNode.tipo == 'A'){
-                                                        printf("\nUsuário será do tipo Administrador.\n");
-                                                        verif2 = 0;
-                                                    }else if(novoUsuario->UserNode.tipo == 'C'){
-                                                        printf("\nUsuário será do tipo Cliente.\n");
-                                                        verif2 = 0;
-                                                    }else if(novoUsuario->UserNode.tipo == 'S'){
-                                                        printf("\nEste programa é pequeno demais para 2 *SUPERUSUÁRIOS*, parceiro. opção inválida.\n");
-                                                        verif2 = 1;
-                                                    }else{
-                                                        printf("\nOpção inválida. escolha [A/C].\n");
-                                                        verif2 = 1;
-                                                    }
-                                                }else if(atualUser->tipo == 'A'){
-                                                    if(novoUsuario->UserNode.tipo == 'A'){
-                                                        printf("\nVocê não tem permissão para adicionar um Administrador.\n");
-                                                        verif2 = 1;
-                                                    }else if(novoUsuario->UserNode.tipo == 'C'){
-                                                        printf("\nUsuário será do tipo Cliente.\n");
-                                                        verif2 = 0;
-                                                    }else if(novoUsuario->UserNode.tipo == 'S'){
-                                                        printf("\nVocê não tem permissão para adicionar um Superusuário.\n");
-                                                        verif2 = 1;
-                                                    }else{
-                                                        printf("\nOpção inválida. você só pode escolher [C].\n");
-                                                        verif2 = 1;
-                                                    }
-                                                }
-                                            } while(verif2);
-
-                                            // Saber se o usuário estará no arquivo.
-                                            do{
-                                                char r;
-                                                printf("\nDeseja salvar o novo usuário no arquivo? [S/N].\nR: ");
-                                                setbuf(stdin, NULL);
-                                                scanf("%c", &r);
-                                                if(r=='s' || r=='S'){
-                                                    printf("\nO usuário será salvo no arquivo.");
-                                                    novoUsuario->isOnFile = 1;
-                                                }else if(r=='n' || r=='N'){
-                                                    printf("\nO usuário não será salvo no arquivo.");
-                                                    novoUsuario->isOnFile = 0;
-                                                }else{
-                                                    printf("\nOpção inválida. escolha [S/N].\n");
-                                                    novoUsuario->isOnFile = -1;
-                                                }
-                                            }while(novoUsuario->isOnFile == -1);
-
-                                            addUserToFile(usersDataBase, Lista, novoUsuario);
-                                        break;
-
-                                        case 2:
-                                            system("cls");
-                                            printf("O=======================================O\n");
-                                            printf("| Você escolheu [2] Remover um usuário. |\n");
-                                            printf("O=======================================O\n");
-                                        break;
-
-                                        case 3:
-                                            system("cls");
-                                            printf("O===============================================O\n");
-                                            printf("| Você escolheu [3] Pesquisar usuário por nome. |\n");
-                                            printf("O===============================================O\n");
-                                        break;
-
-                                        case 4:
-                                            system("cls");
-                                            printf("O==================================O\n");
-                                            printf("| Você escolheu [4] Alterar senha. |\n");
-                                            printf("O==================================O\n");
-                                        break;
-                                        
-                                        case 5:
-                                            system("cls");
-                                            printf("O=============================O\n");
-                                            printf("| Você escolheu [5] deslogar. |\n");
-                                            printf("O=============================O\n");
-                                        break;
-                                        default:
-                                            printf("\nOpção inválida. escolha apenas entre 1 e 2.");
-                                        break;
-                                    }
-                                    proxTela();
-                                } while(rOpc!=5);
-                                break;
-                            }
+                    if(verif == 0){
+                        printf("\nUsuário e senha corretos.\n\nlogado com sucesso!\n\nVocê logou como %s", atualUser->usuario);
+                        proxTela();
+                        int rOpc;
                             
+                        switch (atualUser->tipo)
+                        {
+                            case 'C': // Caso o usuário seja um cliente.
+                            do{
+                                system("cls");
+                                printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Alterar senha.                |\t\t\tTipo: %c\n|    [2] Sair.                         |\nO======================================O\n\nR: ", atualUser->nome, atualUser->usuario, atualUser->tipo);
+                                scanf("%d", &rOpc);
 
-                        }else if(verif == 1){
-                            printf("\nUsuário correto, senha inválida.");
-                            proxTela();
-                        }else{
-                            printf("\nNão foi possível encontrar o usuário.");
-                            proxTela();
+                                switch (rOpc){
+                                    case 1:
+                                        system("cls");
+                                        printf("O====================================O\n");
+                                        printf("| Você escolheu [1] alretar a senha. |\n");
+                                        printf("O====================================O\n");
+                                        proxTela();
+                                    break;
+                                    
+                                    case 2:
+                                        system("cls");
+                                        printf("O=============================O\n");
+                                        printf("| Você escolheu [2] deslogar. |\n");
+                                        printf("O=============================O");
+                                        proxTela();
+                                    break;
+                                    default:
+                                        printf("Opção inválida. escolha apenas entre 1 e 2");
+                                    break;
+                                }
+                            }while(rOpc!=2);
+                            break;
+                    
+                            default: // Caso o usuário seja o *SUPERUSUÁRIO* ou um Administrador.
+                            do
+                            {
+                                system("cls");
+                                printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Cadastrar usuário.            |\t\t\tTipo: %c\n|    [2] Remover usuário.              |\n|    [3] Pesquisar usuário por nome.   |\n|    [4] Alterar senha.                |\n|    [5] Sair.                         |\nO======================================O\n\nR: ", atualUser->nome, atualUser->usuario, atualUser->tipo);
+                                scanf("%d", &rOpc);
+
+                                switch (rOpc){
+                                    case 1:
+                                        system("cls");
+                                        printf("O======================================O\n| Você escolheu [1] Cadastrar usuário. |\nO======================================O\n");
+
+                                        node *novoUsuario = (node*)malloc(sizeof(node));
+                                        int verif2;
+                                        
+                                        // pegar ID do novo usuário.
+                                        novoUsuario->UserNode.id = idGenerator(Lista);
+
+                                        // Pegar nome do novo usuário.
+                                        printf("\nDigite o nome do usuário que você quer adicionar.\nR: ");
+                                        setbuf(stdin, NULL);
+                                        fgets(novoUsuario->UserNode.nome, 128, stdin);
+
+                                        // Pegar dados de ENDEREÇO.
+                                        // Rua do novo usuário.
+                                        printf("\nDigite a rua do usuário que você quer adicionar.\nR: ");
+                                        setbuf(stdin, NULL);
+                                        fgets(novoUsuario->UserNode.endereco.rua, 128, stdin);
+
+                                        // Bairro do novo usuário.
+                                        printf("\nDigite o bairro no usuário que você quer adicionar.\nR: ");
+                                        setbuf(stdin, NULL);
+                                        fgets(novoUsuario->UserNode.endereco.bairro, 128, stdin);
+
+                                        // Número do novo usuário.
+                                        printf("\nDigite o número do usuário que você quer adicionar.\nR: ");
+                                        scanf("%d", &novoUsuario->UserNode.endereco.numero);
+
+                                        // Cep do novo usuário.
+                                        printf("\nDigite o CEP do usuário que você quer adicionar.\nR: ");
+                                        scanf("%d", &novoUsuario->UserNode.endereco.cep);
+
+                                        // Nick de usuário.
+                                        do{
+                                            printf("\nDigite o nick do usuário (parâmetro de login).\nR: ");
+                                            setbuf(stdin, NULL);
+                                            fgets(novoUsuario->UserNode.usuario, 64, stdin);
+
+                                            verif2 = verifLogin(Lista, novoUsuario);
+                                            if(verif2 == 1 || verif2 == 0){
+                                                printf("\nUsuário já cadastrado. tente outro nick.\n");
+                                            }
+                                        }while(verif2!=-1);
+                                        
+                                        // Senha do usuário.
+                                        printf("\nDigite a senha do usuário que você quer adicionar.\nR: ");
+                                        setbuf(stdin, NULL);
+                                        fgets(novoUsuario->UserNode.senha, 64, stdin);
+
+                                        // Tipo de usuário.
+                                        do{
+                                            printf("\nDigite o tipo de usuário.\nR: ");
+                                            setbuf(stdin, NULL);
+                                            scanf("%c", &novoUsuario->UserNode.tipo);
+
+                                            if(atualUser->tipo == 'S'){
+                                                if(novoUsuario->UserNode.tipo == 'A'){
+                                                    printf("\nUsuário será do tipo Administrador.\n");
+                                                    verif2 = 0;
+                                                }else if(novoUsuario->UserNode.tipo == 'C'){
+                                                    printf("\nUsuário será do tipo Cliente.\n");
+                                                    verif2 = 0;
+                                                }else if(novoUsuario->UserNode.tipo == 'S'){
+                                                    printf("\nEste programa é pequeno demais para 2 *SUPERUSUÁRIOS*, parceiro. opção inválida.\n");
+                                                    verif2 = 1;
+                                                }else{
+                                                    printf("\nOpção inválida. escolha [A/C].\n");
+                                                    verif2 = 1;
+                                                }
+                                            }else if(atualUser->tipo == 'A'){
+                                                if(novoUsuario->UserNode.tipo == 'A'){
+                                                    printf("\nVocê não tem permissão para adicionar um Administrador.\n");
+                                                    verif2 = 1;
+                                                }else if(novoUsuario->UserNode.tipo == 'C'){
+                                                    printf("\nUsuário será do tipo Cliente.\n");
+                                                    verif2 = 0;
+                                                }else if(novoUsuario->UserNode.tipo == 'S'){
+                                                    printf("\nVocê não tem permissão para adicionar um Superusuário.\n");
+                                                    verif2 = 1;
+                                                }else{
+                                                    printf("\nOpção inválida. você só pode escolher [C].\n");
+                                                    verif2 = 1;
+                                                }
+                                            }
+                                        } while(verif2);
+
+                                        // Saber se o usuário estará no arquivo.
+                                        do{
+                                            char r;
+                                            printf("\nDeseja salvar o novo usuário no arquivo? [S/N].\nR: ");
+                                            setbuf(stdin, NULL);
+                                            scanf("%c", &r);
+                                            if(r=='s' || r=='S'){
+                                                printf("\nO usuário será salvo no arquivo.");
+                                                novoUsuario->isOnFile = 1;
+                                                addUserToFile(usersDataBase, Lista, novoUsuario);
+                                            }else if(r=='n' || r=='N'){
+                                                printf("\nO usuário não será salvo no arquivo.");
+                                                novoUsuario->isOnFile = 0;
+                                            }else{
+                                                printf("\nOpção inválida. escolha [S/N].\n");
+                                                novoUsuario->isOnFile = -1;
+                                            }
+                                        }while(novoUsuario->isOnFile == -1);
+                                        addUser(Lista, novoUsuario);
+                                        proxTela();
+                                    break;
+
+                                    case 2:
+                                        system("cls");
+                                        printf("O=======================================O\n");
+                                        printf("| Você escolheu [2] Remover um usuário. |\n");
+                                        printf("O=======================================O\n");
+                                        
+                                        proxTela();
+                                    break;
+
+                                    case 3:
+                                        system("cls");
+                                        printf("O===============================================O\n");
+                                        printf("| Você escolheu [3] Pesquisar usuário por nome. |\n");
+                                        printf("O===============================================O\n");
+                                        
+                                        proxTela();
+                                    break;
+
+                                    case 4:
+                                        system("cls");
+                                        printf("O==================================O\n");
+                                        printf("| Você escolheu [4] Alterar senha. |\n");
+                                        printf("O==================================O\n");
+                                        
+                                        proxTela();
+                                    break;
+                                    
+                                    case 5:
+                                        system("cls");
+                                        printf("O=============================O\n");
+                                        printf("| Você escolheu [5] deslogar. |\n");
+                                        printf("O=============================O");
+                                        
+                                        proxTela();
+                                    break;
+                                    default:
+                                        printf("\nOpção inválida. escolha apenas entre 1 e 2.");
+                                    break;
+                                }
+                            } while(rOpc!=5);
+                            break;
                         }
-                    }while(verif != 0);
+                        
+
+                    }else if(verif == 1){
+                        printf("\nUsuário correto, senha inválida.");
+                        proxTela();
+                    }else{
+                        printf("\nNão foi possível encontrar o usuário.");
+                        proxTela();
+                    }
                 break;
 
                 case 2:
                     printf("\nVocê escolheu sair do programa. tenha um bom dia!");
+            
+                    proxTela();
                 break;
 
                 case 3: // Debug.
@@ -554,14 +553,15 @@ int main(){
                     printf("O===================O\n| Opção 3: DEBUG :D |\nO===================O\n\nOs usuários que estão na lista:\n\n");
                     
                     printList(Lista);
-                    proxTela;
+                    proxTela();
                 break;
             
                 default:
                 printf("\nOpção inválida. tente escolher entre 1 e 2.");
+                                        
+                proxTela();
                 break;
             }
-            proxTela();
         } while (rLog!=2);
     }
     return 0;
