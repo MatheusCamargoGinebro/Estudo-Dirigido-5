@@ -81,6 +81,7 @@ void printList(list *lista){
     }
 }
 
+
 list *CreateList(){
     // Declara uma lista vazia dinâmicamente.
     list *lista = (list *)malloc(sizeof(list));
@@ -98,6 +99,39 @@ list *CreateList(){
         return lista;
     }
 }
+
+// Limpar a lista.
+void clearList(list *Lista){
+    node *user;
+
+    // Enquanto o inicio da lista apontar para um nó.
+    while(Lista->inicio != NULL){
+        // Recupera o primeiro elemento da lista.
+        user = Lista->inicio;
+
+        // Faz com que o próximo elemento seja o primeiro elemento da lista.
+        Lista->inicio = user->proximo;
+
+        // Remove o nodo da lista.
+        free(user);
+    }
+    // Libera a memória da variável que representa a lista.
+    free(Lista);
+}
+
+
+int idGenerator(list *lista){
+    int cont=lista->cont;
+    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
+        if(cont==I->UserNode.id){
+            cont--;
+        }else{
+            break;
+        }
+    }
+    return cont;
+}
+
 
 void addUser(list *lista, node *usuarioNode){
     //cria o node da lista dinâmincamente.
@@ -124,7 +158,7 @@ void addUser(list *lista, node *usuarioNode){
 
 
 int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
-    node *aux, *anterior;
+    node *anterior;
     for(node *I = Lista->inicio; I!=NULL; anterior = I, I = I->proximo){ // Não há necessidade de testar se a lista está vazia, já que sempre haverá ao menos um elemento dentro dela.
             if(Id == I->UserNode.id){
                 if(I->UserNode.tipo=='S'){
@@ -148,21 +182,16 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
                             while (1){
                                 int posicao = ftell(fileToEdit);
                                 fread(uRemFil, sizeof(node), 1, fileToEdit);
-                                printf("\nfread\n");
-                                system("pause");
                                 if(feof(fileToEdit)){
                                     break;
                                 }
-                                printuser(uRemFil);
                                 if(I->UserNode.id == uRemFil->UserNode.id){
-                                    printf("achei\n\n");
                                     uRemFil->isOnFile = -1;
 
                                     fseek(fileToEdit, posicao, SEEK_SET);
                                     fwrite(uRemFil, sizeof(node), 1, fileToEdit);
                                     break;
                                 }
-                                system("pause");
                             }
 
                             fclose(fileToEdit);
@@ -190,18 +219,6 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
 */
 
 
-int idGenerator(list *lista){
-    int cont=lista->cont;
-    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
-        if(cont==I->UserNode.id){
-            cont--;
-        }else{
-            break;
-        }
-    }
-    return cont;
-}
-
 int loadListToMemo(list *lista, FILE *fileToLoad){
     int cont=0;
     while (1){
@@ -228,39 +245,30 @@ int loadListToMemo(list *lista, FILE *fileToLoad){
 
 
 void addUserToFile(FILE *fileToAdd, node *NewUser){
-    fileToAdd = fopen("userDataBase.bin", "a+b");
+    fileToAdd = fopen("userDataBase.bin", "r+b");
+    
+    while (1){
+        node *getUser = (node*)malloc(sizeof(node));
+        int posicao = ftell(fileToAdd);
+        fread(getUser, sizeof(node), 1, fileToAdd);
 
-    fwrite(NewUser, sizeof(node), 1, fileToAdd);
+        if(feof(fileToAdd) || getUser->isOnFile==-1){
+            if(getUser->isOnFile==-1){
+                fseek(fileToAdd, posicao, SEEK_SET);
+            }
+
+            fwrite(NewUser, sizeof(node), 1, fileToAdd);
+            break;
+        }
+    }
+    
 
     fclose(fileToAdd);
 }
-/*
-// Limpar a lista (apenas no final do programa).a
-int clearUers(list *lista){
-    if(lista == NULL || lista->inicio == NULL){ // Ou não há lista, ou a lista está vazia.
-        return 0;
-    }else{ // Há lista, e ela será limpa.
-    node *atualUser;
-
-    //enquanto o inicio da lista apontar para um nó
-    while(lista->inicio != NULL){
-            //recupera o primeiro elemento da lista
-            atualUser = lista->inicio;
-
-            //faz com que o próximo elemento seja o primeiro elemento da lista;
-            lista->inicio = atualUser->proximo;
-
-            //remove o nodo da lista
-            free(atualUser);
-    }
-    //libera a memória da variável que representa a lista
-    free(lista);
-    }
-    return 1;
-}*/
 
 
-/*-------------< Funções de exibição e locomoção na lista/arquivo >-------------*/
+
+/*-------------< Funções de verificação e afins >-------------*/
 int verifLogin(list *Lista, user *atualUser){
     int verif = -1;
     for(node *I = Lista->inicio; I!=NULL; I = I->proximo){
@@ -280,6 +288,55 @@ int verifLogin(list *Lista, user *atualUser){
     */
 }
 
+int searchForName(list *Lista, char nameToCheck[]){
+    int verif = 0;
+    for(node *I = Lista->inicio; I!=NULL; I= I->proximo){
+        if (strcmp(I->UserNode.nome, nameToCheck)==0){
+            printuser(I);
+            verif = 1;
+        }
+    }
+    return verif;
+}
+
+int changePassword(list *Lista, FILE *fileToEdit, user *atualUser, char newPassword[]){
+    int verif=0;
+    for(node *I = Lista->inicio; I!=NULL; I= I->proximo){
+
+        if (strcmp(atualUser->usuario, I->UserNode.usuario)==0){
+            
+            strcpy(I->UserNode.senha, newPassword);
+            strcpy(atualUser->senha, newPassword);
+
+            if(I->isOnFile==1){
+                fileToEdit = fopen("userDataBase.bin", "r+b");
+
+                while(1){
+                    int posicao = ftell(fileToEdit);
+                    node *userToEdit = (node*)malloc(sizeof(node));
+                    fread(userToEdit, sizeof(node), 1, fileToEdit);
+
+                    if(feof(fileToEdit)){
+                        break;
+                    }
+                    if(strcmp(atualUser->usuario, I->UserNode.usuario)==0){
+                        strcpy(userToEdit->UserNode.senha, newPassword);
+                        
+                        fseek(fileToEdit, posicao, SEEK_SET);
+                        fwrite(userToEdit, sizeof(node), 1, fileToEdit);
+                        
+                        break;
+                    }
+                }
+
+                fclose(fileToEdit);
+            }
+            verif=1;
+            break;
+        }
+    }
+    return verif;
+}
 
 
 
@@ -388,12 +445,12 @@ int main(){
 
             switch (rLog){
                 case 1:
-                printf(""); // Sem esse printf, estranhamente o código buga e não permite declarar novas variáveis dentro do case.
+                    system("cls");
                     // Reservando um espaço na memória para o usuário atual, de forma dinâmica.
-                    user *atualUser = (user*)malloc(sizeof(user));
+                    user *atualUser = (user*)malloc(1*sizeof(user));
                     int verif;
 
-                    system("cls");
+                    
                     printf("O===========================O\n| Você escolheu fazer login |\nO===========================O\n\n");
                 
                     // Pegando o nome do usuário.
@@ -425,23 +482,31 @@ int main(){
                                 switch (rOpc){
                                     case 1:
                                         system("cls");
-                                        printf("O====================================O\n");
-                                        printf("| Você escolheu [1] alretar a senha. |\n");
-                                        printf("O====================================O\n");
+                                        printf("O====================================O\n| Você escolheu [1] alretar a senha. |\nO====================================O\n");
+                                        char newPassword[64];
+
+                                        printf("Digite a nova senha.\nR:");
+                                        setbuf(stdin, NULL);
+                                        fgets(newPassword, 64, stdin);
+
+                                        if(changePassword(Lista, usersDataBase, atualUser, newPassword)==0){
+                                            printf("\nNão foi possível alterar a senha.");
+                                        }else{
+                                            printf("\nSenha alterada com sucesso.");
+                                        }
                                         proxTela();
                                     break;
                                     
                                     case 2:
                                         system("cls");
-                                        printf("O=============================O\n");
-                                        printf("| Você escolheu [2] deslogar. |\n");
-                                        printf("O=============================O");
+                                        printf("O=============================O\n| Você escolheu [2] deslogar. |\nO=============================O");
+                                        
                                         proxTela();
                                     break;
 
                                     case 3: // Debug.
                                         system("cls");
-                                        printf("O===================O\n| Opção 3: DEBUG :) |\nO===================O\n\nOs usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
+                                        printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
                                         
                                         printList(Lista);
                                         proxTela();
@@ -577,7 +642,7 @@ int main(){
                                         printf("O=======================================O\n| Você escolheu [2] Remover um usuário. |\nO=======================================O\n");
                                         int Id, check;
 
-                                        printf("Digite a Id do usuário que você quer remover.\nR:");
+                                        printf("Digite a Id do usuário que você quer remover.\nR: ");
                                         scanf("%d", &Id);
                                         
                                         check = removeUser(Lista, usersDataBase, atualUser, Id);
@@ -596,34 +661,53 @@ int main(){
 
                                     case 3:
                                         system("cls");
-                                        printf("O===============================================O\n");
-                                        printf("| Você escolheu [3] Pesquisar usuário por nome. |\n");
-                                        printf("O===============================================O\n");
+                                        printf("O===============================================O\n| Você escolheu [3] Pesquisar usuário por nome. |\nO===============================================O\n");
+                                        char rNameUser[128];
+
+                                        // Pegar o nome a ser pesquisado.
+                                        printf("Digite o nome do usuário que você quer pesquisar.\nR: ");
+                                        setbuf(stdin, NULL);
+                                        fgets(rNameUser, 128, stdin);
+                                        printf("\n");
+
+                                        if(searchForName(Lista, rNameUser)==0){
+                                            printf("Não foi possível encontrar o usuário.\n");
+                                        }else{
+                                            printf("Usuário(s) encontrado(s) com sucesso.\n");
+                                        }
+                                         // OBS: não ficou totalmente claro no enunciado se é para pesquisar o nome do usuário (Lista->inicio->UserNode.nome) ou o nome de usuário (Lista->inicio->UserNode.usuario), sendo assim, foi pesquisado o parâmetro nome (Lista->inicio->UserNode.nome).
                                         
                                         proxTela();
                                     break;
 
                                     case 4:
                                         system("cls");
-                                        printf("O==================================O\n");
-                                        printf("| Você escolheu [4] Alterar senha. |\n");
-                                        printf("O==================================O\n");
-                                        
+                                        printf("O==================================O\n| Você escolheu [4] Alterar senha. |\nO==================================O\n");
+                                        char newPassword[64];
+
+                                        printf("Digite a nova senha.\nR:");
+                                        setbuf(stdin, NULL);
+                                        fgets(newPassword, 64, stdin);
+
+                                        if(changePassword(Lista, usersDataBase, atualUser, newPassword)==0){
+                                            printf("\nNão foi possível alterar a senha.");
+                                        }else{
+                                            printf("\nSenha alterada com sucesso.");
+                                        }
+
                                         proxTela();
                                     break;
                                     
                                     case 5:
                                         system("cls");
-                                        printf("O=============================O\n");
-                                        printf("| Você escolheu [5] deslogar. |\n");
-                                        printf("O=============================O");
-                                        
+                                        printf("O=============================O\n| Você escolheu [5] deslogar. |\nO=============================O");
+
                                         proxTela();
                                     break;
 
                                     case 6: // Debug.
                                         system("cls");
-                                        printf("O===================O\n| Opção 6: DEBUG XD |\nO===================O\n\nOs usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
+                                        printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
                                         
                                         printList(Lista);
                                         proxTela();
@@ -649,13 +733,15 @@ int main(){
 
                 case 2:
                     printf("\nVocê escolheu sair do programa. tenha um bom dia!");
-            
+
+                    clearList(Lista); // É necessário apenas apagar a lista da memória, já que o que devia ser salvo já foi salvo :D.
+
                     proxTela();
                 break;
 
                 case 3: // Debug.
                     system("cls");
-                    printf("O===================O\n| Opção 3: DEBUG :D |\nO===================O\n\nOs usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
+                    printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
                     
                     printList(Lista);
                     proxTela();
