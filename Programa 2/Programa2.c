@@ -47,6 +47,7 @@ typedef struct NODE{
 typedef struct{
     node *inicio;
     node *fim;
+    int cont;
 } list;
 
 
@@ -61,6 +62,25 @@ void proxTela(){
     system("cls");
 }
 
+// Imprimer lista (para debug).
+void printuser(node *userToPrint){
+    printf("Id: %d\n", userToPrint->UserNode.id);
+    printf("Nome: %s", userToPrint->UserNode.nome);
+    printf("Bairro: %s", userToPrint->UserNode.endereco.bairro);
+    printf("Rua: %s", userToPrint->UserNode.endereco.rua);
+    printf("Número: %d\n", userToPrint->UserNode.endereco.numero);
+    printf("CEP: %d\n", userToPrint->UserNode.endereco.cep);
+    printf("Usuário: %s", userToPrint->UserNode.usuario);
+    printf("Senha: %s", userToPrint->UserNode.senha);
+    printf("Tipo: %c\n", userToPrint->UserNode.tipo);
+    printf("Salvo no arquivo == %d.\n\n", userToPrint->isOnFile);
+}
+void printList(list *lista){
+    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
+        printuser(I);
+    }
+}
+
 list *CreateList(){
     // Declara uma lista vazia dinâmicamente.
     list *lista = (list *)malloc(sizeof(list));
@@ -73,6 +93,7 @@ list *CreateList(){
     }else{ // Caso não haja erro, o programa inicializa os elementos da lista como NULL (indica lista vazia).
         lista->inicio = NULL;
         lista->fim = NULL;
+        lista->cont = 0;
 
         return lista;
     }
@@ -97,36 +118,107 @@ void addUser(list *lista, node *usuarioNode){
             lista->fim = NewUser;
         }
         lista->inicio = NewUser;
+        lista->cont++;
     }
 }
 
 
+int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
+    node *aux, *anterior;
+    for(node *I = Lista->inicio; I!=NULL; anterior = I, I = I->proximo){ // Não há necessidade de testar se a lista está vazia, já que sempre haverá ao menos um elemento dentro dela.
+            if(Id == I->UserNode.id){
+                if(I->UserNode.tipo=='S'){
+                    return -1;
+                }else{
+                    if(Removedor->tipo=='S' || (Removedor->tipo == 'A' && I->UserNode.tipo == 'C')){ // Indica permissão para remover.
+                        if(I == Lista->inicio){ // Se o elemento está no início da lista
+                        // O segundo elemento passa a ser o início da lista
+                        Lista->inicio = I->proximo;
+
+                        }else{// O Elemento está no meio da lista.
+                            // O proximo do nó anterior passa a ser o proximo do nó encontrado;
+                            anterior->proximo = I->proximo;
+                        }
+                        
+                        if (I->isOnFile==1){
+                            node *uRemFil = (node*)malloc(sizeof(node));
+
+                            fileToEdit = fopen("userDataBase.bin", "r+b");
+    
+                            while (1){
+                                int posicao = ftell(fileToEdit);
+                                fread(uRemFil, sizeof(node), 1, fileToEdit);
+                                printf("\nfread\n");
+                                system("pause");
+                                if(feof(fileToEdit)){
+                                    break;
+                                }
+                                printuser(uRemFil);
+                                if(I->UserNode.id == uRemFil->UserNode.id){
+                                    printf("achei\n\n");
+                                    uRemFil->isOnFile = -1;
+
+                                    fseek(fileToEdit, posicao, SEEK_SET);
+                                    fwrite(uRemFil, sizeof(node), 1, fileToEdit);
+                                    break;
+                                }
+                                system("pause");
+                            }
+
+                            fclose(fileToEdit);
+                        }
+
+                        //libera a memória ocupada pelo nó.
+                        free(I);
+                        Lista->cont--;
+                        //retorna 1 (true) indicando que encontrou e removeu o elemento da lista
+                        return 1;
+                    }else if(Removedor->tipo=='A' && I->UserNode.tipo == 'A'){ // Não tem permissão para remover.
+                        return -2;
+                    }
+                }
+            }
+        }
+    // Retorna 2 (false) indicando que não foi possível encontrar o usuário.
+    return 0;
+}
+/*Gabarito do return:
+    return == -1 == O Id era o do superusuário, ele não pode ser removido.
+    return == -2 == não havia permissão para remover o usuário.
+    return == 0 == não foi possível encontrar o usuário.
+    return == 1 == usuário removido.
+*/
+
+
 int idGenerator(list *lista){
-    int cont=0;
+    int cont=lista->cont;
     for(node *I = lista->inicio; I!=NULL; I = I->proximo){
-        cont++;
+        if(cont==I->UserNode.id){
+            cont--;
+        }else{
+            break;
+        }
     }
     return cont;
 }
 
-
 int loadListToMemo(list *lista, FILE *fileToLoad){
-    node *getUser = (node*)malloc(sizeof(node));
-    int cont=1;
-    
-    do{
-        fseek(fileToLoad, -cont*sizeof(node), SEEK_END);
+    int cont=0;
+    while (1){
+        node *getUser = (node*)malloc(sizeof(node));
         fread(getUser, sizeof(node), 1, fileToLoad);
 
-        node *newUser = (node*)malloc(sizeof(node));
+        if(feof(fileToLoad)){
+            break;
+        }
+        if(getUser->isOnFile!=-1){
+            getUser->UserNode.id = cont;
+            
+            addUser(lista, getUser);
+            cont++;
+        }
+    }
 
-        newUser->UserNode = getUser->UserNode;
-        newUser->isOnFile = getUser->isOnFile;
-
-        addUser(lista, newUser);
-        cont++;
-    }while(getUser->UserNode.tipo!='S');
-    
     if (lista->inicio!=NULL){
         return 0; // Carregado com sucesso.
     }else{
@@ -134,10 +226,11 @@ int loadListToMemo(list *lista, FILE *fileToLoad){
     }
 }
 
-void addUserToFile(FILE *fileToAdd, list *Lista, node *NewUser){
+
+void addUserToFile(FILE *fileToAdd, node *NewUser){
     fileToAdd = fopen("userDataBase.bin", "a+b");
 
-   fwrite(NewUser, sizeof(node), 1, fileToAdd);
+    fwrite(NewUser, sizeof(node), 1, fileToAdd);
 
     fclose(fileToAdd);
 }
@@ -175,7 +268,6 @@ int verifLogin(list *Lista, user *atualUser){
             verif = 1; // Usuário verificado
             if(strcmp(atualUser->senha, I->UserNode.senha)==0){
                 verif = 0; // Senha verificada
-
                 *atualUser = I->UserNode;
             } 
         }
@@ -186,25 +278,6 @@ int verifLogin(list *Lista, user *atualUser){
         return 0 == usuário e senha corretos.
         return -1 == não foi encontrado usuário.
     */
-}
-
-// Imprimer lista (para debug).
-void printuser(node *userToPrint){
-    printf("Id: %d\n", userToPrint->UserNode.id);
-    printf("Nome: %s", userToPrint->UserNode.nome);
-    printf("Bairro: %s", userToPrint->UserNode.endereco.bairro);
-    printf("Rua: %s", userToPrint->UserNode.endereco.rua);
-    printf("Número: %d\n", userToPrint->UserNode.endereco.numero);
-    printf("CEP: %d\n", userToPrint->UserNode.endereco.cep);
-    printf("Usuário: %s", userToPrint->UserNode.usuario);
-    printf("Senha: %s", userToPrint->UserNode.senha);
-    printf("Tipo: %c\n", userToPrint->UserNode.tipo);
-    printf("Salvo no arquivo == %d.\n\n", userToPrint->isOnFile);
-}
-void printList(list *lista){
-    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
-        printuser(I);
-    }
 }
 
 
@@ -219,9 +292,13 @@ int main(){
     list *Lista = CreateList();
 
     FILE *usersDataBase = fopen("userDataBase.bin", "rb");
-
+    
     if(usersDataBase == NULL){ // Não foi possível abrir o arquivo. (tentará criar outro arquivo).
+        fclose(usersDataBase);
         usersDataBase = fopen("userDataBase.bin", "wb");
+        
+        // Salva a lista.
+        fclose(usersDataBase);
         if(usersDataBase!=NULL){// Arquivo criado com sucesso.
             node *superUser = (node*)malloc(sizeof(node));
             printf("O==================================================================================O\n| A lista foi recém criada, sendo assim será necessário cadastrar o *SUPERUSUÁRIO* |\nO==================================================================================O");
@@ -273,11 +350,8 @@ int main(){
             superUser->isOnFile = 1;
     
             proxTela();
-
             // Insere o *SUPERUSUÁRIO* na lista.
-            fwrite(superUser, sizeof(node), 1, usersDataBase);
-            // Salva a lista.
-            fclose(usersDataBase);
+            addUserToFile(usersDataBase,superUser);
             // Libera a memória usada para guardar os dados do *SUPERUSUÁRIO*.
             free(superUser);
             // Abre a lista novamente, desta vez em modo de leitura.
@@ -364,8 +438,17 @@ int main(){
                                         printf("O=============================O");
                                         proxTela();
                                     break;
+
+                                    case 3: // Debug.
+                                        system("cls");
+                                        printf("O===================O\n| Opção 3: DEBUG :) |\nO===================O\n\nOs usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
+                                        
+                                        printList(Lista);
+                                        proxTela();
+                                    break;
                                     default:
                                         printf("Opção inválida. escolha apenas entre 1 e 2");
+                                        proxTela();
                                     break;
                                 }
                             }while(rOpc!=2);
@@ -437,13 +520,13 @@ int main(){
                                             scanf("%c", &novoUsuario->UserNode.tipo);
 
                                             if(atualUser->tipo == 'S'){
-                                                if(novoUsuario->UserNode.tipo == 'A'){
+                                                if(novoUsuario->UserNode.tipo == 'A' || novoUsuario->UserNode.tipo == 'a'){
                                                     printf("\nUsuário será do tipo Administrador.\n");
                                                     verif2 = 0;
-                                                }else if(novoUsuario->UserNode.tipo == 'C'){
+                                                }else if(novoUsuario->UserNode.tipo == 'C' || novoUsuario->UserNode.tipo == 'c'){
                                                     printf("\nUsuário será do tipo Cliente.\n");
                                                     verif2 = 0;
-                                                }else if(novoUsuario->UserNode.tipo == 'S'){
+                                                }else if(novoUsuario->UserNode.tipo == 'S' || novoUsuario->UserNode.tipo == 's'){
                                                     printf("\nEste programa é pequeno demais para 2 *SUPERUSUÁRIOS*, parceiro. opção inválida.\n");
                                                     verif2 = 1;
                                                 }else{
@@ -451,13 +534,13 @@ int main(){
                                                     verif2 = 1;
                                                 }
                                             }else if(atualUser->tipo == 'A'){
-                                                if(novoUsuario->UserNode.tipo == 'A'){
+                                                if(novoUsuario->UserNode.tipo == 'A' || novoUsuario->UserNode.tipo == 'a'){
                                                     printf("\nVocê não tem permissão para adicionar um Administrador.\n");
                                                     verif2 = 1;
-                                                }else if(novoUsuario->UserNode.tipo == 'C'){
+                                                }else if(novoUsuario->UserNode.tipo == 'C' || novoUsuario->UserNode.tipo == 'c'){
                                                     printf("\nUsuário será do tipo Cliente.\n");
                                                     verif2 = 0;
-                                                }else if(novoUsuario->UserNode.tipo == 'S'){
+                                                }else if(novoUsuario->UserNode.tipo == 'S' || novoUsuario->UserNode.tipo == 's'){
                                                     printf("\nVocê não tem permissão para adicionar um Superusuário.\n");
                                                     verif2 = 1;
                                                 }else{
@@ -476,7 +559,7 @@ int main(){
                                             if(r=='s' || r=='S'){
                                                 printf("\nO usuário será salvo no arquivo.");
                                                 novoUsuario->isOnFile = 1;
-                                                addUserToFile(usersDataBase, Lista, novoUsuario);
+                                                addUserToFile(usersDataBase, novoUsuario);
                                             }else if(r=='n' || r=='N'){
                                                 printf("\nO usuário não será salvo no arquivo.");
                                                 novoUsuario->isOnFile = 0;
@@ -491,10 +574,23 @@ int main(){
 
                                     case 2:
                                         system("cls");
-                                        printf("O=======================================O\n");
-                                        printf("| Você escolheu [2] Remover um usuário. |\n");
-                                        printf("O=======================================O\n");
+                                        printf("O=======================================O\n| Você escolheu [2] Remover um usuário. |\nO=======================================O\n");
+                                        int Id, check;
+
+                                        printf("Digite a Id do usuário que você quer remover.\nR:");
+                                        scanf("%d", &Id);
                                         
+                                        check = removeUser(Lista, usersDataBase, atualUser, Id);
+                                        if(check == -2){
+                                            printf("\nVocê não tem permissão para remover este usuário.");
+                                        }else if(check == -1){
+                                            printf("\nNão é possível remover o SuperUsuário.");
+                                        }else if(check==0){
+                                            printf("\nNão foi possível encontrar o usuário.");
+                                        }else{
+                                            printf("\nUsuáruio removido com sucesso.");
+                                        }
+
                                         proxTela();
                                     break;
 
@@ -524,8 +620,17 @@ int main(){
                                         
                                         proxTela();
                                     break;
+
+                                    case 6: // Debug.
+                                        system("cls");
+                                        printf("O===================O\n| Opção 6: DEBUG XD |\nO===================O\n\nOs usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
+                                        
+                                        printList(Lista);
+                                        proxTela();
+                                    break;
                                     default:
-                                        printf("\nOpção inválida. escolha apenas entre 1 e 2.");
+                                        printf("\nOpção inválida. escolha apenas entre 1 e 5.");
+                                        proxTela();
                                     break;
                                 }
                             } while(rOpc!=5);
@@ -550,7 +655,7 @@ int main(){
 
                 case 3: // Debug.
                     system("cls");
-                    printf("O===================O\n| Opção 3: DEBUG :D |\nO===================O\n\nOs usuários que estão na lista:\n\n");
+                    printf("O===================O\n| Opção 3: DEBUG :D |\nO===================O\n\nOs usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
                     
                     printList(Lista);
                     proxTela();
