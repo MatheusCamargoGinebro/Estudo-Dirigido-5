@@ -112,12 +112,31 @@ int idGenerator(list *lista){
 
 int loadListToMemo(list *lista, FILE *fileToLoad){
     node *getUser = (node*)malloc(sizeof(node));
-    int cont=0;
+    int cont=1;
+
     do{
+        fseek(fileToLoad, -cont*sizeof(node), SEEK_END);
         fread(getUser, sizeof(node), 1, fileToLoad);
-        addUser(lista, getUser);
+
+        printf("Id: %d\n", getUser->UserNode.id);
+        printf("Nome: %s", getUser->UserNode.nome);
+        printf("Bairro: %s", getUser->UserNode.endereco.bairro);
+        printf("Rua: %s", getUser->UserNode.endereco.rua);
+        printf("Número: %d\n", getUser->UserNode.endereco.numero);
+        printf("CEP: %d\n", getUser->UserNode.endereco.cep);
+        printf("Usuário: %s", getUser->UserNode.usuario);
+        printf("Senha: %s", getUser->UserNode.senha);
+        printf("Tipo: %c\n\n", getUser->UserNode.tipo);
+
+        node *newUser = (node*)malloc(sizeof(node));
+
+        newUser->UserNode = getUser->UserNode;
+        newUser->isOnFile = getUser->isOnFile;
+
+
+        addUser(lista, newUser);
         cont++;
-    }while(fseek(fileToLoad, cont*sizeof(node), SEEK_SET)!=0);
+    }while(getUser->UserNode.tipo!='S');
 
     if (lista->inicio!=NULL){
         return 0; // Carregado com sucesso.
@@ -128,21 +147,9 @@ int loadListToMemo(list *lista, FILE *fileToLoad){
 }
 
 void addUserToFile(FILE *fileToAdd, list *Lista, node *NewUser){
-    fileToAdd = fopen("userDataBase.bin", "ab");
+    fileToAdd = fopen("userDataBase.bin", "a+b");
 
-    int cont = 0;
-
-    do{
-        if(fseek(fileToAdd, cont*sizeof(node), SEEK_SET == 0)){
-            fwrite(NewUser, sizeof(node), 1, fileToAdd);
-        }
-    }while(fseek(fileToAdd, cont*sizeof(node), SEEK_SET)!=0);
-
-    fclose(fileToAdd);
-
-    fileToAdd = fopen("userDatabase.bin", "r");
-
-    loadListToMemo(Lista, fileToAdd);
+   fwrite(NewUser, sizeof(node), 1, fileToAdd);
 
     fclose(fileToAdd);
 }
