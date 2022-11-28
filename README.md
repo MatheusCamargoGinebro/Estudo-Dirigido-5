@@ -149,7 +149,8 @@ gravar os dados gerados em um arquivo binário sempre que necessário.
         (imagine um arquivo com 10 milhões de alunos cadastrados ?) e não será permitido neste estudo
         dirigido!
         
-        Desta forma, apenas os novos alunos (aqueles que estão na lista e não estão no arquivo) devem ser inseridosno arquivo.
+        Desta forma, apenas os novos alunos (aqueles que estão na lista e não estão no arquivo)
+        devem ser inseridosno arquivo.
         
         
    > OBS 1: Ao iniciar o seu programa (executá-lo) é preciso criar a lista ligada (iniciar a lista). Para isso, você deve primeiramente verificar se já existem nós cadastrados no arquivo. Caso o arquivo já exista (porque foi gerado em uma execução anterior), você deve criar a lista ligada inserindo os nós que já pertencem ao arquivo. Em outras palavras, é preciso carregar na lista ligada os dados que já foram gerados em uma execução anterior e que, portanto, já estão salvos no arquivo. Você deve criar uma lista vazia apenas se o arquivo não existir (ou estiver vazio - sem nenhum nó cadastrado).
