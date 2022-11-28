@@ -130,11 +130,11 @@ Programa 2.
     tamanho, porém a saída é sempre de tamanho fixo.
     
         Como exemplo, temos o SHA256 que é um hash bastante utilizado capaz de receber uma entrada
-        qualquer e gerar um código pseudo aleatório (resumo ou hash calculado) com 256 bits de tamanho.
+    qualquer e gerar um código pseudo aleatório (resumo ou hash calculado) com 256 bits de tamanho.
     
         Assim, imagine que a senha digitada pelo usuário seja a entrada da função (E). Primeiramente, 
-        aplica-se a função hash H produzindoa saída S (H(E) = S). O valor S é então armazenado como 
-        sendo o resumo criptográfico da senha que é digitada como entrada pelo usuário. 
+    aplica-se a função hash H produzindoa saída S (H(E) = S). O valor S é então armazenado como 
+    sendo o resumo criptográfico da senha que é digitada como entrada pelo usuário. 
    
   > Uma boa função hash tem algumas propriedades interessantes:
 
