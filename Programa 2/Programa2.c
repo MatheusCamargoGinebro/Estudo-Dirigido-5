@@ -2,16 +2,170 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+
 /*
 O=======================================================================O
 | Estudo dirigido 5 - Programa 2 - Sistema de login com Lista encadeada |
 |    Nomes:                                                             |
 |        Matheus Camargo Ginebro CP3016153                              |
 |        Lucas Haiter Leoni CP3017362                                   |
+|     Por favor, contar este programa como o que vai valer a nota do    |
+|     Estudo Dirigido.                                                  |
 O=======================================================================O
 */
+/*------------------------------< Implementação do HASH com SHA256 >------------------------------*/
+//Código pego em <https://www.programmingalgorithms.com/algorithm/sha256/c/>.
+
+/* Perdão professor, mas nós não conseguiriamos fazer isso por nós mesmos 
+(bolar todo essas funções de hash). portanto, para não deixar a atividade com partes faltando, pegamos
+o HASH de um site. O link está logo acima.*/
+
+#define uchar unsigned char
+#define uint unsigned int
+#define DBL_INT_ADD(a,b,c) if (a > 0xffffffff - (c)) ++b; a += c;
+#define ROTLEFT(a,b) (((a) << (b)) | ((a) >> (32-(b))))
+#define ROTRIGHT(a,b) (((a) >> (b)) | ((a) << (32-(b))))
+#define CH(x,y,z) (((x) & (y)) ^ (~(x) & (z)))
+#define MAJ(x,y,z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
+#define EP0(x) (ROTRIGHT(x,2) ^ ROTRIGHT(x,13) ^ ROTRIGHT(x,22))
+#define EP1(x) (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
+#define SIG0(x) (ROTRIGHT(x,7) ^ ROTRIGHT(x,18) ^ ((x) >> 3))
+#define SIG1(x) (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
+typedef struct {
+	uchar data[64];
+	uint datalen;
+	uint bitlen[2];
+	uint state[8];
+} SHA256_CTX;
+uint k[64] = {
+	0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+	0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+	0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+	0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+	0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+	0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+	0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+	0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+};
+void SHA256Transform(SHA256_CTX *ctx, uchar data[]){
+	uint a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
+	for (i = 0, j = 0; i < 16; ++i, j += 4)
+		m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
+	for (; i < 64; ++i)
+		m[i] = SIG1(m[i - 2]) + m[i - 7] + SIG0(m[i - 15]) + m[i - 16];
+	a = ctx->state[0];
+	b = ctx->state[1];
+	c = ctx->state[2];
+	d = ctx->state[3];
+	e = ctx->state[4];
+	f = ctx->state[5];
+	g = ctx->state[6];
+	h = ctx->state[7];
+	for (i = 0; i < 64; ++i) {
+		t1 = h + EP1(e) + CH(e, f, g) + k[i] + m[i];
+		t2 = EP0(a) + MAJ(a, b, c);
+		h = g;
+		g = f;
+		f = e;
+		e = d + t1;
+		d = c;
+		c = b;
+		b = a;
+		a = t1 + t2;
+	}
+	ctx->state[0] += a;
+	ctx->state[1] += b;
+	ctx->state[2] += c;
+	ctx->state[3] += d;
+	ctx->state[4] += e;
+	ctx->state[5] += f;
+	ctx->state[6] += g;
+	ctx->state[7] += h;
+}
+void SHA256Init(SHA256_CTX *ctx)
+{
+	ctx->datalen = 0;
+	ctx->bitlen[0] = 0;
+	ctx->bitlen[1] = 0;
+	ctx->state[0] = 0x6a09e667;
+	ctx->state[1] = 0xbb67ae85;
+	ctx->state[2] = 0x3c6ef372;
+	ctx->state[3] = 0xa54ff53a;
+	ctx->state[4] = 0x510e527f;
+	ctx->state[5] = 0x9b05688c;
+	ctx->state[6] = 0x1f83d9ab;
+	ctx->state[7] = 0x5be0cd19;
+}
+void SHA256Update(SHA256_CTX *ctx, uchar data[], uint len)
+{
+	for (uint i = 0; i < len; ++i) {
+		ctx->data[ctx->datalen] = data[i];
+		ctx->datalen++;
+		if (ctx->datalen == 64) {
+			SHA256Transform(ctx, ctx->data);
+			DBL_INT_ADD(ctx->bitlen[0], ctx->bitlen[1], 512);
+			ctx->datalen = 0;
+		}
+	}
+}
+void SHA256Final(SHA256_CTX *ctx, uchar hash[])
+{
+	uint i = ctx->datalen;
+
+	if (ctx->datalen < 56) {
+		ctx->data[i++] = 0x80;
+		while (i < 56)
+			ctx->data[i++] = 0x00;
+	}
+	else {
+		ctx->data[i++] = 0x80;
+		while (i < 64)
+			ctx->data[i++] = 0x00;
+		SHA256Transform(ctx, ctx->data);
+		memset(ctx->data, 0, 56);
+	}
+	DBL_INT_ADD(ctx->bitlen[0], ctx->bitlen[1], ctx->datalen * 8);
+	ctx->data[63] = ctx->bitlen[0];
+	ctx->data[62] = ctx->bitlen[0] >> 8;
+	ctx->data[61] = ctx->bitlen[0] >> 16;
+	ctx->data[60] = ctx->bitlen[0] >> 24;
+	ctx->data[59] = ctx->bitlen[1];
+	ctx->data[58] = ctx->bitlen[1] >> 8;
+	ctx->data[57] = ctx->bitlen[1] >> 16;
+	ctx->data[56] = ctx->bitlen[1] >> 24;
+	SHA256Transform(ctx, ctx->data);
+	for (i = 0; i < 4; ++i) {
+		hash[i] = (ctx->state[0] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 4] = (ctx->state[1] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 8] = (ctx->state[2] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 12] = (ctx->state[3] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 16] = (ctx->state[4] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 20] = (ctx->state[5] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 24] = (ctx->state[6] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 28] = (ctx->state[7] >> (24 - i * 8)) & 0x000000ff;
+	}
+}
+char* H(char* data) {
+	int strLen = strlen(data);
+	SHA256_CTX ctx;
+	unsigned char hash[32];
+	char* hashStr = malloc(65);
+	strcpy(hashStr, "");
+	SHA256Init(&ctx);
+	SHA256Update(&ctx, data, strLen);
+	SHA256Final(&ctx, hash);
+	char s[3];
+	for (int i = 0; i < 32; i++) {
+		sprintf(s, "%02x", hash[i]);
+		strcat(hashStr, s);
+	}
+	return hashStr;
+}
+/*---------------------------< ^ Fim das funções de HASH/SHA256 ^ >---------------------------*/
 
 /*------------------------------< Structs >------------------------------*/
+
+//Estrutura de endereço.
 typedef struct{
     char rua[128];
     char bairro[128];
@@ -19,17 +173,16 @@ typedef struct{
     int cep;
 } address;
 
-
+//Estrutura que guarda os dados do usuário (incluindo uma estrutura de endereço).
 typedef struct{
     // Dados obrigatórios da atividade
     int id;
-    char nome[128]; // Desculpa professor, mas doia muito no coração colocar o tamanho das strings como 100 e 50... colocamos números que estão na base 2 (2^7==128 e 2^6==64).
+    char nome[128];
     char usuario[64];
-    char senha[64];
+    char senha[65]; // Se fosse 50, como pedido no enunciado, ou até mesmo 64 não haveria espaço para por toda a chave e mais o \0.
     char tipo;
     address endereco;
 } user;
-
 
 // Estrutura de nó (node).
 typedef struct NODE{
@@ -53,35 +206,36 @@ typedef struct{
 
 
 /*------------------------------< Functions >------------------------------*/
-
-/*-------------< Funções de modificação de lista/arquivo >-------------*/
-// Função estética.
+/*-------------< Funções de exibição >-------------*/
+// Função de limpar a tela (é um system("cls"); só que aprimorado).
 void proxTela(){
     printf("\n\n");
     system("pause");
     system("cls");
 }
 
-// Imprimer lista (para debug).
+// Imprime um único node.
 void printuser(node *userToPrint){
-    printf("Id: %d\n", userToPrint->UserNode.id);
+    printf("Usuário: %s", userToPrint->UserNode.usuario);
     printf("Nome: %s", userToPrint->UserNode.nome);
-    printf("Bairro: %s", userToPrint->UserNode.endereco.bairro);
+    printf("Tipo: %c\n", userToPrint->UserNode.tipo);
+    printf("Id: %d\n", userToPrint->UserNode.id);
     printf("Rua: %s", userToPrint->UserNode.endereco.rua);
+    printf("Bairro: %s", userToPrint->UserNode.endereco.bairro);
     printf("Número: %d\n", userToPrint->UserNode.endereco.numero);
     printf("CEP: %d\n", userToPrint->UserNode.endereco.cep);
-    printf("Usuário: %s", userToPrint->UserNode.usuario);
-    printf("Senha: %s", userToPrint->UserNode.senha);
-    printf("Tipo: %c\n", userToPrint->UserNode.tipo);
     printf("Salvo no arquivo == %d.\n\n", userToPrint->isOnFile);
 }
+
+// Imprime uma lista inteira.
 void printList(list *lista){
     for(node *I = lista->inicio; I!=NULL; I = I->proximo){
         printuser(I);
     }
 }
 
-
+/*-------------< Funções de modificação de lista/arquivo >-------------*/
+// Função para Criar a lista.
 list *CreateList(){
     // Declara uma lista vazia dinâmicamente.
     list *lista = (list *)malloc(sizeof(list));
@@ -89,8 +243,8 @@ list *CreateList(){
     // Verifica se a lista foi realmente criada.
     if (lista == NULL){ // Caso haja erro, filaizará o programa.
         printf("\nErro ao alocar memória para a lista.\n");
-
         exit(1);
+
     }else{ // Caso não haja erro, o programa inicializa os elementos da lista como NULL (indica lista vazia).
         lista->inicio = NULL;
         lista->fim = NULL;
@@ -100,7 +254,7 @@ list *CreateList(){
     }
 }
 
-// Limpar a lista.
+// Função para Limpar a lista.
 void clearList(list *Lista){
     node *user;
 
@@ -119,20 +273,28 @@ void clearList(list *Lista){
     free(Lista);
 }
 
-
+// Função para gerar um Id para um novo usuário.
 int idGenerator(list *lista){
-    int cont=lista->cont;
-    for(node *I = lista->inicio; I!=NULL; I = I->proximo){
-        if(cont==I->UserNode.id){
-            cont--;
-        }else{
-            break;
+    // Declara uma variável de verificação e um cont.
+    int verif, cont=0;
+    // A função testa para achar um valor que seja igual à algum Id.
+    do{
+        verif=0;
+        for(node *I = lista->inicio; I!=NULL; I = I->proximo){
+            if(cont == I->UserNode.id){
+                verif=1;
+                break;
+            }
         }
-    }
-    return cont;
+        if (verif==1){ // Quando a função encontra um Id igual ao cont, o cont é incrementado.
+            cont++;
+        }
+    }while(verif!=0); // Enquanto a função não encontrar um valor para cont, que seja diferente de todos os IDs, ela não para.
+
+    return cont; // Quando a função acha um valor para o novo Id, esse valor é retornado par a main.
 }
 
-
+// Função para adicionar um usuário à lista. *(também serve para carregar usuários de um arquivo, trabalhando em conjunto com a função loadToMemo)
 void addUser(list *lista, node *usuarioNode){
     //cria o node da lista dinâmincamente.
     node *NewUser = (node*)malloc(sizeof(node));
@@ -156,24 +318,25 @@ void addUser(list *lista, node *usuarioNode){
     }
 }
 
-
+// Função para remover da lista. (e dependendo do caso, do arquivo também).
 int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
     node *anterior;
     for(node *I = Lista->inicio; I!=NULL; anterior = I, I = I->proximo){ // Não há necessidade de testar se a lista está vazia, já que sempre haverá ao menos um elemento dentro dela.
-            if(Id == I->UserNode.id){
-                if(I->UserNode.tipo=='S'){
+            if(Id == I->UserNode.id){ // Achou um usuário com o ID parecido.
+                if(I->UserNode.tipo=='S'){ // Se esse usuário for o SuperUsuário, a função retorna -1, não permitindo a remoção.
                     return -1;
                 }else{
                     if(Removedor->tipo=='S' || (Removedor->tipo == 'A' && I->UserNode.tipo == 'C')){ // Indica permissão para remover.
-                        if(I == Lista->inicio){ // Se o elemento está no início da lista
-                        // O segundo elemento passa a ser o início da lista
+                        if(I == Lista->inicio){ // Se o elemento está no início da lista.
+                        // O segundo elemento passa a ser o início da lista.
                         Lista->inicio = I->proximo;
 
                         }else{// O Elemento está no meio da lista.
                             // O proximo do nó anterior passa a ser o proximo do nó encontrado;
                             anterior->proximo = I->proximo;
                         }
-                        
+
+                        // Testando se o elemento está salvo no arquivo.
                         if (I->isOnFile==1){
                             node *uRemFil = (node*)malloc(sizeof(node));
 
@@ -185,8 +348,12 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
                                 if(feof(fileToEdit)){
                                     break;
                                 }
-                                if(I->UserNode.id == uRemFil->UserNode.id){
-                                    uRemFil->isOnFile = -1;
+                                if(I->UserNode.id == uRemFil->UserNode.id){ 
+                                    uRemFil->isOnFile = -1; // O item IsOnfile define se o arquivo está ou não no arquivo.
+                                    /*  Caso ele esteja, seu valor é 1. ------ Quando removido, seu valor passa a ser -1, indicando
+                                     que o espaço que ele ocupa pode ser reaproveitado.
+                                        Foi feito desta maneira, pois aparentemente você não pode simplesmente "remover" 
+                                    algo da memória, mas pode sobrescrever."*/
 
                                     fseek(fileToEdit, posicao, SEEK_SET);
                                     fwrite(uRemFil, sizeof(node), 1, fileToEdit);
@@ -219,9 +386,9 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
 */
 
 
+// Função para carregar os dados de um arquivo para a memória.
 int loadListToMemo(list *lista, FILE *fileToLoad){
-    int cont=0;
-    while (1){
+    while(1){
         node *getUser = (node*)malloc(sizeof(node));
         fread(getUser, sizeof(node), 1, fileToLoad);
 
@@ -229,13 +396,10 @@ int loadListToMemo(list *lista, FILE *fileToLoad){
             break;
         }
         if(getUser->isOnFile!=-1){
-            getUser->UserNode.id = cont;
             
             addUser(lista, getUser);
-            cont++;
         }
     }
-
     if (lista->inicio!=NULL){
         return 0; // Carregado com sucesso.
     }else{
@@ -244,10 +408,10 @@ int loadListToMemo(list *lista, FILE *fileToLoad){
 }
 
 
+// Função para salvar um usuário no arquivo.
 void addUserToFile(FILE *fileToAdd, node *NewUser){
     fileToAdd = fopen("userDataBase.bin", "r+b");
-    
-    while (1){
+    while(1){
         node *getUser = (node*)malloc(sizeof(node));
         int posicao = ftell(fileToAdd);
         fread(getUser, sizeof(node), 1, fileToAdd);
@@ -261,14 +425,13 @@ void addUserToFile(FILE *fileToAdd, node *NewUser){
             break;
         }
     }
-    
-
     fclose(fileToAdd);
 }
 
 
 
-/*-------------< Funções de verificação e afins >-------------*/
+/*-------------< Funções de verificação e etc >-------------*/
+// Função para verificar os parâmetros de senha e de node de usuário. (dependendo da situação, pode-se testar apenas um dos itens (se quiser)).
 int verifLogin(list *Lista, user *atualUser){
     int verif = -1;
     for(node *I = Lista->inicio; I!=NULL; I = I->proximo){
@@ -281,13 +444,16 @@ int verifLogin(list *Lista, user *atualUser){
         }
     }
     return verif; 
-    /*      Gabarito do return (verif):
-        return 1 == Usuário encontrado, senha inválida.
-        return 0 == usuário e senha corretos.
-        return -1 == não foi encontrado usuário.
-    */
 }
+/*  
+    Gabarito do return (verif):
+    return 1 == Usuário encontrado, senha inválida.
+    return 0 == usuário e senha corretos.
+    return -1 == não foi encontrado usuário.
+*/
 
+
+// Função para procurar um usuário pelo nome.
 int searchForName(list *Lista, char nameToCheck[]){
     int verif = 0;
     for(node *I = Lista->inicio; I!=NULL; I= I->proximo){
@@ -299,18 +465,17 @@ int searchForName(list *Lista, char nameToCheck[]){
     return verif;
 }
 
+
+// Função para trocar a senha.
 int changePassword(list *Lista, FILE *fileToEdit, user *atualUser, char newPassword[]){
     int verif=0;
     for(node *I = Lista->inicio; I!=NULL; I= I->proximo){
-
         if (strcmp(atualUser->usuario, I->UserNode.usuario)==0){
-            
             strcpy(I->UserNode.senha, newPassword);
             strcpy(atualUser->senha, newPassword);
 
             if(I->isOnFile==1){
                 fileToEdit = fopen("userDataBase.bin", "r+b");
-
                 while(1){
                     int posicao = ftell(fileToEdit);
                     node *userToEdit = (node*)malloc(sizeof(node));
@@ -328,7 +493,6 @@ int changePassword(list *Lista, FILE *fileToEdit, user *atualUser, char newPassw
                         break;
                     }
                 }
-
                 fclose(fileToEdit);
             }
             verif=1;
@@ -394,10 +558,24 @@ int main(){
             setbuf(stdin, NULL);
             fgets(superUser->UserNode.usuario, 64, stdin);
 
-            // Dar a senha para o login do *SUPERUSUÁRIO*
+            // Dar a senha (criptografada) para o login do *SUPERUSUÁRIO*.
+             // Definindo uma variável temporária para pegar a senha.
+            char *TempPassW = (char*)malloc(64*sizeof(char));
+            //Pegando a senha
             printf("\nInsira a Senha do *SUPERUSUÁRIO* (parâmetro para fazer o login).\nR: ");
             setbuf(stdin, NULL);
-            fgets(superUser->UserNode.senha, 64, stdin);
+            fgets(TempPassW, 64, stdin);
+
+            // Fazendo o hasshing da senha.
+            TempPassW = H(TempPassW);
+
+            // Passando a senha (com o HASH já executado) para o node.
+            strcpy(superUser->UserNode.senha, TempPassW);
+
+            /* Limpando a variável temporária para garantir mais segurança. 
+            (não somos peritos em segurança da computação/hacking, então não sabemos se realmente 
+            funcionaria isso... Mas tá aí, por desencargo de conciência).*/
+            free(TempPassW);
 
             //Definir o tipo de usuário (no caso, é fixo em *SUPERUSUÁRIO*).
             printf("\nO *SUPERUSUÁRIO* recebe o tipo S (*SUPERUSUÁRIO*).");
@@ -459,12 +637,23 @@ int main(){
                     fgets(atualUser->usuario, 64, stdin);
 
                     // Pegando a senha do usuário.
+                     // Definindo uma variável temporária para a pegar a senha do usuário.
+                    char *TempPassW = (char*)malloc(64*sizeof(char));
+
                     printf("\nDigite sua senha.\nR: ");
                     setbuf(stdin, NULL);
-                    fgets(atualUser->senha, 64, stdin);
+                    fgets(TempPassW, 64, stdin);
+
+                    // Fazendo o HASH dessa senha.
+                    TempPassW = H(TempPassW);
+
+                    // Passando a senha com HASH para a estrutura que ajuda na verificação de login.
+                    strcpy(atualUser->senha, TempPassW);
 
                     // Passando o resultado da função para uma variável de verificação.
                     verif = verifLogin(Lista, atualUser);
+
+                    free(TempPassW);
                     
                     if(verif == 0){
                         printf("\nUsuário e senha corretos.\n\nlogado com sucesso!\n\nVocê logou como %s", atualUser->usuario);
@@ -483,17 +672,27 @@ int main(){
                                     case 1:
                                         system("cls");
                                         printf("O====================================O\n| Você escolheu [1] alretar a senha. |\nO====================================O\n");
-                                        char newPassword[64];
+                                        
+                                        //Declarando uma string temporária para pegar a nova senha digitada pelo usuário.
+                                        char *TempNewPassW = (char*)malloc(64*sizeof(char));
 
-                                        printf("Digite a nova senha.\nR:");
+                                        // Pegando a nova senha
+                                        printf("\nDigite a sua nova senha.\nR: ");
                                         setbuf(stdin, NULL);
-                                        fgets(newPassword, 64, stdin);
+                                        fgets(TempNewPassW, 64, stdin);
 
-                                        if(changePassword(Lista, usersDataBase, atualUser, newPassword)==0){
+                                        // Fazendo o HASH dessa senha.
+                                        TempNewPassW = H(TempNewPassW);
+
+                                        // Passando a senha com HASH para a estrutura que ajuda na verificação de login.
+                                        strcpy(atualUser->senha, TempNewPassW);
+
+                                        if(changePassword(Lista, usersDataBase, atualUser, TempNewPassW)==0){
                                             printf("\nNão foi possível alterar a senha.");
                                         }else{
                                             printf("\nSenha alterada com sucesso.");
                                         }
+                                        free(TempNewPassW);
                                         proxTela();
                                     break;
                                     
@@ -574,10 +773,20 @@ int main(){
                                         }while(verif2!=-1);
                                         
                                         // Senha do usuário.
+                                        // variável de senha temporária.
+                                        char *TempPassW = (char*)malloc(64*sizeof(char));
                                         printf("\nDigite a senha do usuário que você quer adicionar.\nR: ");
                                         setbuf(stdin, NULL);
-                                        fgets(novoUsuario->UserNode.senha, 64, stdin);
+                                        fgets(TempPassW, 64, stdin);
 
+                                        // Fazendo o HASH da senha.
+                                        TempPassW = H(TempPassW);
+
+                                        // Passando a senha já criptografada para o novo node.
+                                        strcpy(novoUsuario->UserNode.senha, TempPassW);
+
+                                        // Limpando a variável temporária.
+                                        free(TempPassW);
                                         // Tipo de usuário.
                                         do{
                                             printf("\nDigite o tipo de usuário.\nR: ");
@@ -683,18 +892,26 @@ int main(){
                                     case 4:
                                         system("cls");
                                         printf("O==================================O\n| Você escolheu [4] Alterar senha. |\nO==================================O\n");
-                                        char newPassword[64];
+                                        //Declarando uma string temporária para pegar a nova senha digitada pelo usuário.
+                                        char *TempNewPassW = (char*)malloc(64*sizeof(char));
 
-                                        printf("Digite a nova senha.\nR:");
+                                        // Pegando a nova senha
+                                        printf("\nDigite a sua nova senha.\nR: ");
                                         setbuf(stdin, NULL);
-                                        fgets(newPassword, 64, stdin);
+                                        fgets(TempNewPassW, 64, stdin);
 
-                                        if(changePassword(Lista, usersDataBase, atualUser, newPassword)==0){
+                                        // Fazendo o HASH dessa senha.
+                                        TempNewPassW = H(TempNewPassW);
+
+                                        // Passando a senha com HASH para a estrutura que ajuda na verificação de login.
+                                        strcpy(atualUser->senha, TempNewPassW);
+
+                                        if(changePassword(Lista, usersDataBase, atualUser, TempNewPassW)==0){
                                             printf("\nNão foi possível alterar a senha.");
                                         }else{
                                             printf("\nSenha alterada com sucesso.");
                                         }
-
+                                        free(TempNewPassW);
                                         proxTela();
                                     break;
                                     
@@ -720,8 +937,6 @@ int main(){
                             } while(rOpc!=5);
                             break;
                         }
-                        
-
                     }else if(verif == 1){
                         printf("\nUsuário correto, senha inválida.");
                         proxTela();
