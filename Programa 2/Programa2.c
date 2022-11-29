@@ -360,7 +360,6 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id){
                                     break;
                                 }
                             }
-
                             fclose(fileToEdit);
                         }
 
@@ -566,7 +565,7 @@ int main(){
             setbuf(stdin, NULL);
             fgets(TempPassW, 64, stdin);
 
-            // Fazendo o hasshing da senha.
+            // Fazendo o hashing da senha.
             TempPassW = H(TempPassW);
 
             // Passando a senha (com o HASH já executado) para o node.
@@ -589,7 +588,7 @@ int main(){
             addUserToFile(usersDataBase,superUser);
             // Libera a memória usada para guardar os dados do *SUPERUSUÁRIO*.
             free(superUser);
-            // Abre a lista novamente, desta vez em modo de leitura.
+            // Tenta novamente abrir o arquivo em modo leitura, para que seja possível carregar o superusuário na lista.
             usersDataBase = fopen("userDataBase.bin", "rb");
 
             if(usersDataBase == NULL){
@@ -598,7 +597,7 @@ int main(){
                 exit(1);
             }
         }else{
-            printf("\nERRO: não foi possível criar/carregar o arquivo. adios.");
+            printf("\nERRO: não foi possível criar/carregar o arquivo. adios.\n");
             proxTela();
             exit(1);
         }
@@ -606,11 +605,11 @@ int main(){
 
     // Carregando dados dos usuários para a lista.
     if(loadListToMemo(Lista, usersDataBase)!=0){
-        printf("O============================================================O\n| Não foi possível carregar os nós do arquivo para a memória |\nO============================================================O");
+        printf("ERROR: Não foi possível carregar os nós do arquivo para a memória.O programa será finalizado.\n");
         proxTela();
         exit(1);
     }else{
-        printf("O========================================================O\n| Os nós salvos no arquivo foram carregados com sucesso. |\nO========================================================O");
+        printf("Os nós salvos no arquivo foram carregados com sucesso!\n");
         fclose(usersDataBase); // Fechando/salvando o arquivo após carregá-lo para a memória.
         proxTela();
 
@@ -637,7 +636,7 @@ int main(){
                     fgets(atualUser->usuario, 64, stdin);
 
                     // Pegando a senha do usuário.
-                     // Definindo uma variável temporária para a pegar a senha do usuário.
+                     // Definindo uma string temporária para a pegar a senha do usuário.
                     char *TempPassW = (char*)malloc(64*sizeof(char));
 
                     printf("\nDigite sua senha.\nR: ");
@@ -650,10 +649,11 @@ int main(){
                     // Passando a senha com HASH para a estrutura que ajuda na verificação de login.
                     strcpy(atualUser->senha, TempPassW);
 
+                    //Limpando a string temporária.
+                    free(TempPassW);
+
                     // Passando o resultado da função para uma variável de verificação.
                     verif = verifLogin(Lista, atualUser);
-
-                    free(TempPassW);
                     
                     if(verif == 0){
                         printf("\nUsuário e senha corretos.\n\nlogado com sucesso!\n\nVocê logou como %s", atualUser->usuario);
@@ -703,7 +703,7 @@ int main(){
                                         proxTela();
                                     break;
 
-                                    case 3: // Debug.
+                                    case 598752185463186196751981535249151: // Debug.
                                         system("cls");
                                         printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
                                         
@@ -773,7 +773,7 @@ int main(){
                                         }while(verif2!=-1);
                                         
                                         // Senha do usuário.
-                                        // variável de senha temporária.
+                                        // String de senha temporária.
                                         char *TempPassW = (char*)malloc(64*sizeof(char));
                                         printf("\nDigite a senha do usuário que você quer adicionar.\nR: ");
                                         setbuf(stdin, NULL);
@@ -785,8 +785,9 @@ int main(){
                                         // Passando a senha já criptografada para o novo node.
                                         strcpy(novoUsuario->UserNode.senha, TempPassW);
 
-                                        // Limpando a variável temporária.
+                                        // Limpando a String temporária.
                                         free(TempPassW);
+
                                         // Tipo de usuário.
                                         do{
                                             printf("\nDigite o tipo de usuário.\nR: ");
@@ -911,6 +912,7 @@ int main(){
                                         }else{
                                             printf("\nSenha alterada com sucesso.");
                                         }
+                                        // Limpando a string temporária.
                                         free(TempNewPassW);
                                         proxTela();
                                     break;
@@ -922,7 +924,7 @@ int main(){
                                         proxTela();
                                     break;
 
-                                    case 6: // Debug.
+                                    case 598752185463186196751981535249151: // Debug.
                                         system("cls");
                                         printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
                                         
@@ -954,7 +956,7 @@ int main(){
                     proxTela();
                 break;
 
-                case 3: // Debug.
+                case 598752185463186196751981535249151: // Debug.
                     system("cls");
                     printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
                     
