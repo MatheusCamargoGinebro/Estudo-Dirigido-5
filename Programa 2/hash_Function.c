@@ -9,7 +9,7 @@
 #define DBL_INT_ADD(a, b, c)  \
     if (a > 0xffffffff - (c)) \
         ++b;                  \
-    a += c;
+        a += c;
 #define ROTLEFT(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
 #define ROTRIGHT(a, b) (((a) >> (b)) | ((a) << (32 - (b))))
 #define CH(x, y, z) (((x) & (y)) ^ (~(x) & (z)))

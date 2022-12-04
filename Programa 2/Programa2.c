@@ -238,7 +238,7 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id)
                             if (I->UserNode.id == uRemFil->UserNode.id)
                             {
                                 uRemFil->isOnFile = -1; // O item IsOnfile define se o arquivo está ou não no arquivo.
-                                //Caso ele esteja, seu valor é 1. ------ Quando removido, seu valor passa a ser -1, indicando que o espaço que ele ocupa pode ser reaproveitado. Foi feito desta maneira, pois aparentemente você não pode simplesmente "remover" algo da memória, mas pode "sobrescrever".
+                                // Caso ele esteja, seu valor é 1. ------ Quando removido, seu valor passa a ser -1, indicando que o espaço que ele ocupa pode ser reaproveitado. Foi feito desta maneira, pois aparentemente você não pode simplesmente "remover" algo da memória, mas pode "sobrescrever".
 
                                 fseek(fileToEdit, posicao, SEEK_SET);
                                 fwrite(uRemFil, sizeof(node), 1, fileToEdit);
@@ -247,7 +247,6 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id)
                         }
                         fclose(fileToEdit);
                     }
-
                     // libera a memória ocupada pelo nó.
                     free(I);
                     Lista->cont--;
@@ -315,7 +314,6 @@ void addUserToFile(FILE *fileToAdd, node *NewUser)
             {
                 fseek(fileToAdd, posicao, SEEK_SET);
             }
-
             fwrite(NewUser, sizeof(node), 1, fileToAdd);
             break;
         }
@@ -391,10 +389,8 @@ int changePassword(list *Lista, FILE *fileToEdit, user *atualUser, char newPassw
                     if (strcmp(atualUser->usuario, I->UserNode.usuario) == 0)
                     {
                         strcpy(userToEdit->UserNode.senha, newPassword);
-
                         fseek(fileToEdit, posicao, SEEK_SET);
                         fwrite(userToEdit, sizeof(node), 1, fileToEdit);
-
                         break;
                     }
                 }
@@ -885,17 +881,17 @@ int main()
                                 verif2 = 0;
                                 char R2;
 
-                                for(node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
+                                for (node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
                                 {
-                                    if(Node->isOnFile == 0)
-                                    {   
+                                    if (Node->isOnFile == 0)
+                                    {
                                         verif2 = 1;
                                         break;
                                     }
                                 }
                                 proxTela();
 
-                                if(verif2 == 1 )
+                                if (verif2 == 1)
                                 {
                                     do
                                     {
@@ -904,26 +900,29 @@ int main()
                                         setbuf(stdin, NULL);
                                         scanf("%c", &R2);
 
-                                        if(R2 == 'S' || R2 == 's')
+                                        if (R2 == 'S' || R2 == 's')
                                         {
                                             printf("\nAgora, será exibido usuário por usuário, e você decidirá o que acontece com eles.");
                                             verif2 = 0;
                                         }
-                                        else if(R2 == 'N' || R2 == 'n')
+                                        else if (R2 == 'N' || R2 == 'n')
                                         {
                                             printf("\nOs usuários não salvos serão perdidos. fazendo logout.");
                                             verif2 = -1;
-                                        }else{
+                                        }
+                                        else
+                                        {
                                             printf("\nOpção inválida. Escolha entre [S/N].");
                                             verif2 = 1;
                                         }
                                         proxTela();
                                     } while (verif2 == 1);
-                                    
-                                    if(verif2 ==0){
-                                        for(node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
+
+                                    if (verif2 == 0)
+                                    {
+                                        for (node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
                                         {
-                                            if(Node->isOnFile == 0)
+                                            if (Node->isOnFile == 0)
                                             {
                                                 printf("Informações do usuário:\n\n");
                                                 printuser(Node);
@@ -945,7 +944,7 @@ int main()
                                                         printf("\nO usuário não será salvo no arquivo.");
                                                         verif2 = 0;
                                                     }
-                                                    else if(R2 == 'e' || R2 == 'E')
+                                                    else if (R2 == 'e' || R2 == 'E')
                                                     {
                                                         printf("\nOs usuários não salvos serão perdidos.\n\nfazendo logout.");
                                                         verif2 = 0;
@@ -957,7 +956,8 @@ int main()
                                                     }
                                                 } while (verif2);
 
-                                                if(R2 == 'e' || R2 == 'E'){
+                                                if (R2 == 'e' || R2 == 'E')
+                                                {
                                                     proxTela();
                                                     break;
                                                 }
@@ -966,7 +966,7 @@ int main()
                                         }
                                     }
                                 }
-                            break;
+                                break;
 
                             case 598758: // Debug.
                                 system("cls");

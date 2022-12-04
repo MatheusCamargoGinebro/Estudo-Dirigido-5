@@ -87,7 +87,7 @@ gravar os dados gerados em um arquivo binário sempre que necessário.
         >-> Caso o aluno seja removido da lista (remoção com sucesso), é necessário verificar
         se o mesmo também existe no arquivo (porque foi inserido anteriormente). 
             Assim, caso o aluno removido da lista esteja salvo também no arquivo, é preciso
-            que a remoção garanta que o aluno também seja excluído doarquivo.
+            que a remoção garanta que o aluno também seja excluído do arquivo.
 
   >  
 
