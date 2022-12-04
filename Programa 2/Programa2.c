@@ -396,10 +396,12 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id)
                             if (I->UserNode.id == uRemFil->UserNode.id)
                             {
                                 uRemFil->isOnFile = -1; // O item IsOnfile define se o arquivo está ou não no arquivo.
-                                /*  Caso ele esteja, seu valor é 1. ------ Quando removido, seu valor passa a ser -1, indicando
-                                 que o espaço que ele ocupa pode ser reaproveitado.
+                                /*    
+                                    Caso ele esteja, seu valor é 1. ------ Quando removido, seu valor passa a ser -1, indicando
+                                    que o espaço que ele ocupa pode ser reaproveitado.
                                     Foi feito desta maneira, pois aparentemente você não pode simplesmente "remover"
-                                algo da memória, mas pode sobrescrever."*/
+                                    algo da memória, mas pode "sobrescrever".
+                                */
 
                                 fseek(fileToEdit, posicao, SEEK_SET);
                                 fwrite(uRemFil, sizeof(node), 1, fileToEdit);
@@ -676,7 +678,7 @@ int main()
     // Carregando dados dos usuários para a lista.
     if (loadListToMemo(Lista, usersDataBase) != 0)
     {
-        printf("ERROR: Não foi possível carregar os nós do arquivo para a memória.O programa será finalizado.\n");
+        printf("ERROR: Não foi possível carregar os nós do arquivo para a memória. O programa será finalizado.\n");
         proxTela();
         exit(1);
     }
@@ -784,7 +786,7 @@ int main()
                                 proxTela();
                                 break;
 
-                            case 598752185463186196751981535249151: // Debug.
+                            case 598758: // Debug.
                                 system("cls");
                                 printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
 
@@ -939,18 +941,20 @@ int main()
                                         printf("\nO usuário será salvo no arquivo.");
                                         novoUsuario->isOnFile = 1;
                                         addUserToFile(usersDataBase, novoUsuario);
+                                        verif2 = 0;
                                     }
                                     else if (r == 'n' || r == 'N')
                                     {
                                         printf("\nO usuário não será salvo no arquivo.");
                                         novoUsuario->isOnFile = 0;
+                                        verif2 = 0;
                                     }
                                     else
                                     {
                                         printf("\nOpção inválida. escolha [S/N].\n");
-                                        novoUsuario->isOnFile = -1;
+                                        verif2 = 1;
                                     }
-                                } while (novoUsuario->isOnFile == -1);
+                                } while (verif2);
                                 addUser(Lista, novoUsuario);
                                 proxTela();
                                 break;
@@ -1047,7 +1051,7 @@ int main()
                                 proxTela();
                                 break;
 
-                            case 598752185463186196751981535249151: // Debug.
+                            case 598758: // Debug.
                                 system("cls");
                                 printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
 
@@ -1083,7 +1087,7 @@ int main()
                 proxTela();
                 break;
 
-            case 598752185463186196751981535249151: // Debug.
+            case 598758: // Debug.
                 system("cls");
                 printf("Os usuários que estão na lista:\t\t\tQuantidade de usuários: %d\n\n", Lista->cont);
 
