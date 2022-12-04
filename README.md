@@ -1,6 +1,26 @@
 # Estudo dirigido 5
 Repositório do estudo dirigido 5 - Matéria de Lógica e técnicas de programação.
 
+  > Antes de tudo, um agradecimento aos professores Diego Fernandes Gonçalves Martins e Fabio Feliciano de Oliveira:
+      
+    Agradecimento:
+      
+      Esta parde do readMe serve para agradecer aos dois professores pelos ensinamentos que nos 
+    deram ao longo do ano. 😉
+    
+      Estamos muito gratos com as aulas e dicas dadas ao longo do ano... e terminamos o ano com a 
+    certeza de que aprendemos muito no campo da programação e lógica. 
+
+      Com relação à este estudo dirigido, como era o último estudo dirigido do ano, decidimos fazer
+    algo a mais, portanto, estamos entregando ele pelo github, uma plataforma que com certeza 
+    usaremos muito num futuro próximo.
+    
+      Caso seja necessário, por qualquer motivo que seja, estamos dispostos a explicar o código de
+    ambos os programas, bastando apenas entrar em contato conosco (Matheus ou Lucas)... 😊
+    (pelos testes que fizemos, não encontramos nenhum erro :P ). 😬
+    
+    No mais, obrigado novamente pelos ensinamentos ao longo do ano, estamos muito gratos.
+      
 
   Este repositório serve para guardar o estudo dirigido 5, que é uma atividade da disciplina de ILG - Lógica e Técnicas de Programação, 
 na qual os alunos do Instituto Federal de Educação, Ciência e Tecnologia de São Paulo - IFSP Câmpus Campinas precisam fazer um determinado programa,
