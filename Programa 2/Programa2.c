@@ -579,6 +579,7 @@ int main()
     list *Lista = CreateList();
 
     FILE *usersDataBase = fopen("userDataBase.bin", "rb");
+    int verif2;
 
     if (usersDataBase == NULL)
     { // Não foi possível abrir o arquivo. (tentará criar outro arquivo).
@@ -815,7 +816,6 @@ int main()
                                 printf("O======================================O\n| Você escolheu [1] Cadastrar usuário. |\nO======================================O\n");
 
                                 node *novoUsuario = (node *)malloc(sizeof(node));
-                                int verif2;
 
                                 // pegar ID do novo usuário.
                                 novoUsuario->UserNode.id = idGenerator(Lista);
@@ -1044,12 +1044,92 @@ int main()
 
                             case 5:
                                 system("cls");
-                                printf("O=============================O\n| Você escolheu [5] deslogar. |\nO=============================O");
+                                printf("O=========================O\n| Você escolheu [5] sair. |\nO=========================O");
+                                verif2 = 0;
+                                char R2;
 
-                                // Não é necessário salvar nada, já que o que deveria ser salvo já foi salvo.
-
+                                for(node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
+                                {
+                                    if(Node->isOnFile == 0)
+                                    {   
+                                        verif2 = 1;
+                                        break;
+                                    }
+                                }
                                 proxTela();
-                                break;
+
+                                if(verif2 == 1 )
+                                {
+                                    do
+                                    {
+                                        system("cls");
+                                        printf("Há usuários na lista que ainda não foram salvos.\n\ndeseja fazer uma última alteração? [S/N] (os usuários não salvos serão perdidos).\nR: ");
+                                        setbuf(stdin, NULL);
+                                        scanf("%c", &R2);
+
+                                        if(R2 == 'S' || R2 == 's')
+                                        {
+                                            printf("\nAgora, será exibido usuário por usuário, e você decidirá o que acontece com eles.");
+                                            verif2 = 0;
+                                        }
+                                        else if(R2 == 'N' || R2 == 'n')
+                                        {
+                                            printf("\nOs usuários não salvos serão perdidos. fazendo logout.");
+                                            verif2 = -1;
+                                        }else{
+                                            printf("\nOpção inválida. Escolha entre [S/N].");
+                                            verif2 = 1;
+                                        }
+                                        proxTela();
+                                    } while (verif2 == 1);
+                                    
+                                    if(verif2 ==0){
+                                        for(node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
+                                        {
+                                            if(Node->isOnFile == 0)
+                                            {
+                                                printf("Informações do usuário:\n\n");
+                                                printuser(Node);
+
+                                                do
+                                                {
+                                                    printf("Deseja salvar Este usuário? S = Sim. N = Não. E = Sair sem salvar nada.\nR: ");
+                                                    setbuf(stdin, NULL);
+                                                    scanf("%c", &R2);
+                                                    if (R2 == 's' || R2 == 'S')
+                                                    {
+                                                        printf("\nO usuário será salvo no arquivo.");
+                                                        Node->isOnFile = 1;
+                                                        addUserToFile(usersDataBase, Node);
+                                                        verif2 = 0;
+                                                    }
+                                                    else if (R2 == 'n' || R2 == 'N')
+                                                    {
+                                                        printf("\nO usuário não será salvo no arquivo.");
+                                                        verif2 = 0;
+                                                    }
+                                                    else if(R2 == 'e' || R2 == 'E')
+                                                    {
+                                                        printf("\nOs usuários não salvos serão perdidos.\n\nfazendo logout.");
+                                                        verif2 = 0;
+                                                    }
+                                                    else
+                                                    {
+                                                        printf("\nOpção inválida. escolha entre [S/N/E].");
+                                                        verif2 = 1;
+                                                    }
+                                                } while (verif2);
+
+                                                if(R2 == 'e' || R2 == 'E'){
+                                                    proxTela();
+                                                    break;
+                                                }
+                                                proxTela();
+                                            }
+                                        }
+                                    }
+                                }
+                            break;
 
                             case 598758: // Debug.
                                 system("cls");
