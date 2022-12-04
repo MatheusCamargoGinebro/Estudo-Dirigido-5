@@ -412,9 +412,6 @@ int main()
 {
     setlocale(LC_ALL, "portuguese");
 
-    char String[] = "Hello World";
-    printf("%s\n", H(String));
-
     // Iniciando arquvo e lista.
     list *Lista = CreateList();
 
