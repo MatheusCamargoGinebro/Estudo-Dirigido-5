@@ -1,53 +1,57 @@
 # Estudo dirigido 5
-Repositório do estudo dirigido 5 - Matéria de Lógica e técnicas de programação.
-
-  > Antes de tudo, um agradecimento aos professores Diego Fernandes Gonçalves Martins e Fabio Feliciano de Oliveira:
-      
-    Agradecimento:
-      
-      Esta parde do readMe serve para agradecer aos dois professores pelos ensinamentos que nos 
-    deram ao longo do ano. 😉
-    
-      Estamos muito gratos com as aulas e dicas dadas ao longo do ano... e terminamos o ano com a 
-    certeza de que aprendemos muito no campo da programação e lógica. 
-
-      Com relação à este estudo dirigido, como era o último estudo dirigido do ano, decidimos fazer
-    algo a mais, portanto, estamos entregando ele pelo github, uma plataforma que com certeza 
-    usaremos muito num futuro próximo.
-    
-      Caso seja necessário, por qualquer motivo que seja, estamos dispostos a explicar o código de
-    ambos os programas, bastando apenas entrar em contato conosco (Matheus ou Lucas)... 😊
-    (pelos testes que fizemos, não encontramos nenhum erro :P ). 😬
-    
-    No mais, obrigado novamente pelos ensinamentos ao longo do ano, estamos muito gratos.
-      
-
-  Este repositório serve para guardar o estudo dirigido 5, que é uma atividade da disciplina de ILG - Lógica e Técnicas de Programação, 
+#### Repositório do estudo dirigido 5 - Matéria de Lógica e técnicas de programação.
+  > Este repositório serve para guardar o estudo dirigido 5, que é uma atividade da disciplina de ILG - Lógica e Técnicas de Programação, 
 na qual os alunos do Instituto Federal de Educação, Ciência e Tecnologia de São Paulo - IFSP Câmpus Campinas precisam fazer um determinado programa,
 ou determinada pesquisa.
 
-  As "especificações" da atividade estão listadas abaixo.
+  > Estudo dirigido feito por:\
+   [Matheus Camargo Ginebro  CP3016153](https://github.com/MatheusCamargoGinebro)\
+   [Lucas Haiter Leoni  CP3017362](https://github.com/lucashaiter)
+   
 
+  ##### Antes de tudo, um agradecimento aos professores Diego Fernandes Gonçalves Martins e Fabio Feliciano de Oliveira:
+      
+    Agradecimento:
+      
+      Esta parde do readMe serve para agradecer aos dois professores por todos os ensinamentos e
+    dicas ao longo do ano, portanto, é algo meio "informal".
 
-Programa 1.
-  > O objetivo da primeira parte deste estudo dirigido é garantir a persistência dos dados que
-foram produzidos durante o estudo dirigido 4. Para isso, é importante que o usuário possa
-gravar os dados gerados em um arquivo binário sempre que necessário.
-
-
-    Sistema de Cadastro Acadêmico Utilizando Lista Ligada Simples:
-
-    Faça um programa de sistema acadêmico que gerencie o desempenho dos alunos da disciplina de 
-    Lógica e Técnicas de Programação.
+      Então... obrigado, por tudo que os senhores nos ensinaram, obrigado por todas as dicas e as
+    boas técnicas que os senhores nos deram 😀
     
-    O programa deve conter um registro (estrutura/struct) que consiga armazenar os seguintes 
-    dados de um aluno:
+      Com relação à este estudo dirigido, ao que tiramos de conclusão através de testes e testes,
+    não achamos erros, portanto, ambos estão funcionando. (obs: obviamente deve haver algum erro,
+    pois não há como fazer um "código perfeito"... o que queremos dizer, é que tratamos o máximo
+    o possível dos erros de usuário, além de que a parte principal do código (a parte em que se
+    pede nos enunciados do programa 1 e programa 2) está funcionando sem problemas).
+
+      Gostariamos também de ressaltar que estamos disponíveis para responder qualquer dúvida sobre
+    ambos os códigos (programa 1 e programa 2).
+
+      No mais é isso... obrigado novamente pelas aulas e dicas, este foi um ano de muito aprendizado
+    graças aos senhores.
+      
+      
+      Att.
+        Matheus Camargo Ginebro CP3016153 
+        Lucas Haiter Leoni CP3017362 
+        
+## Programa 1.
+
+  > O objetivo da primeira parte deste estudo dirigido é garantir a persistência dos dados que foram produzidos durante o estudo dirigido 4. Para isso, é importante que o usuário possa gravar os dados gerados em um arquivo binário sempre que necessário.
+
+
+   > Sistema de Cadastro Acadêmico Utilizando Lista Ligada Simples:\
+   > \
+   > Faça um programa de sistema acadêmico que gerencie o desempenho dos alunos da disciplina de Lógica e Técnicas de Programação.\
+   > \
+   > O programa deve conter um registro (estrutura/struct) que consiga armazenar os seguintes dados de um aluno:
     
-    nome;
-    matrícula;
-    nota;
-    frequência; 
-    turma;
+        nome;
+        matrícula;
+        nota;
+        frequência; 
+        turma;
     
    > O programa deve permitir o recebimento desses dados para vários alunos. Seu programa deve armazenar os alunos em uma Lista Ligada
     Simples, como visto na aula. O programa deverá conter um menu com as seguintes opções:
@@ -62,7 +66,7 @@ gravar os dados gerados em um arquivo binário sempre que necessário.
         8. Gravar dados;
         9. Sair;
     
-  > A seguir são dados mais detalhes sobre o funcionamento de cada opção do menu:
+  #### A seguir são dados mais detalhes sobre o funcionamento de cada opção do menu:
 
 
       Opção 1 - Cadastrar aluno:
@@ -179,13 +183,16 @@ gravar os dados gerados em um arquivo binário sempre que necessário.
   > OBS 2: É obrigatório fazer uma função específica chamada inserirAluno que adiciona um novo aluno (nó da lista) na lista ligada, recebendo como parâmetro de entrada os atributos do aluno (nome, matrícula, nota, frequência e turma) que foram previamente digitados pelo usuário na função main e um ponteiro para o início da lista. 
 
 
-  > Essa função deve utilizar uma outra função chamada verificarAluno que, por sua vez, percorre toda a lista ligada retornando 1, caso o aluno já exista e 0 caso o aluno não exista na lista. 
+  > Essa função deve utilizar uma outra função chamada verificarAluno que, por sua vez, percorre toda a lista ligada retornando 1, caso o aluno já exista e 0 caso o aluno não exista na lista. \
+  \
+   O novo aluno deve ser inserido apenas se a função verificarAluno retornar 0.
 
 
-  > O novo aluno deve ser inserido apenas se a função verificarAluno retornar 0.
-  
+<sub>Fim das especificações do programa 1.</sub>
 
-Programa 2.
+
+
+## Programa 2.
   > Você deve criar uma estrutura do tipo cadastro que seja capaz de armazenar as pessoas cadastradas no sistema. Abaixo os campos obrigatórios:
 
         ID (int);
@@ -240,7 +247,7 @@ Programa 2.
     **(Deve sair do sistema, gravando todos os dados não salvos no arquivo).
                           
                           
-  > Abaixo temos a descrição dos itens dos submenus que devem ser apresentados apenas depois que o usuário digitar suas credenciais:
+  ####  Abaixo temos a descrição dos itens dos submenus que devem ser apresentados apenas depois que o usuário digitar suas credenciais:
       
       1. Cadastrar Usuário:
           >>> Insere um novo nó na lista do tipo Cliente ou Administrador;
@@ -256,7 +263,7 @@ Programa 2.
             
           >>> A senha não deve ser armazenada como um texto em claro (texto sem criptografia)
           por medidas de segurança. 
-    **Mais informações sobre como trabalhar com a senha são dadas mais a frente;
+            * Mais informações sobre como trabalhar com a senha são dadas mais a frente. *
           
           >>> O ID é sempre único e, portanto, ao cadastrar um usuário ele deve ser o próximo
             disponível (o próximo que não foi utilizado por nenhum nó da lista).
@@ -296,7 +303,20 @@ Programa 2.
 
 
       
-  > Informações sobre a senha:
+  #### Informações sobre a senha:
+  
+   > Ao tentar logar no sistema, o usuário irá digitar a sua senha E. Neste momento, o sistema calcula H(E) e compara o resultado com aquele H(E) que foi registrado no sistema no momento do cadastro do usuário. Caso sejam iguais, a senha é considerada correta e o usuário é autenticado, passando para o seu submenu.
+      
+  > (Faça uma pesquisa básica para entender um pouco mais sobre funções hash. Logo depois, descubra como utilizar o SHA256 em linguagem C e mantenha as senhas dos usuários protegidas, como mostrado acima).
+
+  > Uma boa função hash tem algumas propriedades interessantes:
+
+    1- É muito difícil (probabilisticamente improvável) descobrir E apenas conhecendo a 
+        função H e o código S;
+        
+    2- É muito difícil encontrar E1 e E2 tais que H(E1) = H(E2) = S.
+    
+>
 
         Em sistemas seguros, a senha dos usuários não é diretamente armazenada. Ao invés disso,
     os sistemas costumam armazenar o hash da senha digitada pelo usuário. O hash são funções
@@ -310,12 +330,16 @@ Programa 2.
     aplica-se a função hash H produzindoa saída S (H(E) = S). O valor S é então armazenado como 
     sendo o resumo criptográfico da senha que é digitada como entrada pelo usuário. 
    
-  > Uma boa função hash tem algumas propriedades interessantes:
+<sub>Fim das especificações do programa 2.</sub>
+##
 
-        1- É muito difícil (probabilisticamente improvável) descobrir E apenas conhecendo a 
-        função H e o código S;
-        2- É muito difícil encontrar E1 e E2 tais que H(E1) = H(E2) = S.
+  >  
 
-  > Ao tentar logar no sistema, o usuário irá digitar a sua senha E. Neste momento, o sistema calcula H(E) e compara o resultado com aquele H(E) que foi registrado no sistema no momento do cadastro do usuário. Caso sejam iguais, a senha é considerada correta e o usuário é autenticado, passando para o seu submenu.
-      
-  > (Faça uma pesquisa básica para entender um pouco mais sobre funções hash. Logo depois, descubra como utilizar o SHA256 em linguagem C e mantenha as senhas dos usuários protegidas, como mostrado acima).
+       ___   _______  _______  _______
+      |   | |    ___||  _____||    _  |
+      |   | |   |___ | |_____ |   |_| |
+      |   | |    ___||_____  ||    ___|
+      |   | |   |     _____| ||   |    
+      |___| |___|    |_______||___|    
+
+
