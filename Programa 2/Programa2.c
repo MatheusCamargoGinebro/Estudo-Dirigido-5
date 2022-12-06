@@ -323,18 +323,18 @@ void addUserToFile(FILE *fileToAdd, node *NewUser)
 
 /*-------------< Funções de verificação e etc >-------------*/
 // Função para verificar os parâmetros de senha e de node de usuário. (dependendo da situação, pode-se testar apenas um dos itens (se quiser)).
-int verifLogin(list *Lista, user *atualUser)
+int verifLogin(list *Lista, node *atualUser)
 {
     int verif = -1;
     for (node *I = Lista->inicio; I != NULL; I = I->proximo)
     {
-        if (strcmp(atualUser->usuario, I->UserNode.usuario) == 0)
+        if (strcmp(atualUser->UserNode.usuario, I->UserNode.usuario) == 0)
         {
             verif = 1; // Usuário verificado
-            if (strcmp(atualUser->senha, I->UserNode.senha) == 0)
+            if (strcmp(atualUser->UserNode.senha, I->UserNode.senha) == 0)
             {
                 verif = 0; // Senha verificada
-                *atualUser = I->UserNode;
+                atualUser->UserNode = I->UserNode;
             }
         }
     }
