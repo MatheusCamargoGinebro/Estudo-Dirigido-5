@@ -194,7 +194,7 @@ void addUser(list *lista, node *usuarioNode)
 }
 
 // Função para remover da lista. (e dependendo do caso, do arquivo também).
-int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id)
+int removeUser(list *Lista, FILE *fileToEdit, node *Removedor, int Id)
 {
     node *anterior;
     for (node *I = Lista->inicio; I != NULL; anterior = I, I = I->proximo)
@@ -207,7 +207,7 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id)
             }
             else
             {
-                if (Removedor->tipo == 'S' || (Removedor->tipo == 'A' && I->UserNode.tipo == 'C'))
+                if (Removedor->UserNode.tipo == 'S' || (Removedor->UserNode.tipo == 'A' && I->UserNode.tipo == 'C'))
                 { // Indica permissão para remover.
                     if (I == Lista->inicio)
                     { // Se o elemento está no início da lista.
@@ -253,7 +253,7 @@ int removeUser(list *Lista, FILE *fileToEdit, user *Removedor, int Id)
                     // retorna 1 (true) indicando que encontrou e removeu o elemento da lista
                     return 1;
                 }
-                else if (Removedor->tipo == 'A' && I->UserNode.tipo == 'A')
+                else if (Removedor->UserNode.tipo == 'A' && I->UserNode.tipo == 'A')
                 { // Não tem permissão para remover.
                     return -2;
                 }
@@ -363,15 +363,15 @@ int searchForName(list *Lista, char nameToCheck[])
 }
 
 // Função para trocar a senha.
-int changePassword(list *Lista, FILE *fileToEdit, user *atualUser, char newPassword[])
+int changePassword(list *Lista, FILE *fileToEdit, node *atualUser, char newPassword[])
 {
     int verif = 0;
     for (node *I = Lista->inicio; I != NULL; I = I->proximo)
     {
-        if (strcmp(atualUser->usuario, I->UserNode.usuario) == 0)
+        if (strcmp(atualUser->UserNode.usuario, I->UserNode.usuario) == 0)
         {
             strcpy(I->UserNode.senha, newPassword);
-            strcpy(atualUser->senha, newPassword);
+            strcpy(atualUser->UserNode.senha, newPassword);
 
             if (I->isOnFile == 1)
             {
@@ -386,7 +386,7 @@ int changePassword(list *Lista, FILE *fileToEdit, user *atualUser, char newPassw
                     {
                         break;
                     }
-                    if (strcmp(atualUser->usuario, I->UserNode.usuario) == 0)
+                    if (strcmp(atualUser->UserNode.usuario, I->UserNode.usuario) == 0)
                     {
                         strcpy(userToEdit->UserNode.senha, newPassword);
                         fseek(fileToEdit, posicao, SEEK_SET);
@@ -534,7 +534,7 @@ int main()
             case 1:
                 system("cls");
                 // Reservando um espaço na memória para o usuário atual, de forma dinâmica.
-                user *atualUser = (user *)malloc(1 * sizeof(user));
+                node *atualUser = (node*)malloc(1 * sizeof(node));
                 int verif;
 
                 printf("O===========================O\n| Você escolheu fazer login |\nO===========================O\n\n");
@@ -542,7 +542,7 @@ int main()
                 // Pegando o nome do usuário.
                 printf("Digite seu nome de usuário.\nR: ");
                 setbuf(stdin, NULL);
-                fgets(atualUser->usuario, 64, stdin);
+                fgets(atualUser->UserNode.usuario, 64, stdin);
 
                 // Pegando a senha do usuário.
                 // Definindo uma string temporária para a pegar a senha do usuário.
@@ -556,7 +556,7 @@ int main()
                 TempPassW = H(TempPassW);
 
                 // Passando a senha com HASH para a estrutura que ajuda na verificação de login.
-                strcpy(atualUser->senha, TempPassW);
+                strcpy(atualUser->UserNode.senha, TempPassW);
 
                 // Limpando a string temporária.
                 free(TempPassW);
@@ -566,17 +566,17 @@ int main()
 
                 if (verif == 0)
                 {
-                    printf("\nUsuário e senha corretos.\n\nlogado com sucesso!\n\nVocê logou como %s", atualUser->usuario);
+                    printf("\nUsuário e senha corretos.\n\nlogado com sucesso!\n\nVocê logou como %s", atualUser->UserNode.usuario);
                     proxTela();
                     int rOpc;
 
-                    switch (atualUser->tipo)
+                    switch (atualUser->UserNode.tipo)
                     {
                     case 'C': // Caso o usuário seja um cliente.
                         do
                         {
                             system("cls");
-                            printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Alterar senha.                |\t\t\tTipo: %c\n|    [2] Sair.                         |\nO======================================O\n\nR: ", atualUser->nome, atualUser->usuario, atualUser->tipo);
+                            printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Alterar senha.                |\t\t\tTipo: %c\n|    [2] Sair.                         |\nO======================================O\n\nR: ", atualUser->UserNode.nome, atualUser->UserNode.usuario, atualUser->UserNode.tipo);
                             scanf("%d", &rOpc);
 
                             switch (rOpc)
@@ -597,7 +597,7 @@ int main()
                                 TempNewPassW = H(TempNewPassW);
 
                                 // Passando a senha com HASH para a estrutura que ajuda na verificação de login.
-                                strcpy(atualUser->senha, TempNewPassW);
+                                strcpy(atualUser->UserNode.senha, TempNewPassW);
 
                                 if (changePassword(Lista, usersDataBase, atualUser, TempNewPassW) == 0)
                                 {
@@ -639,7 +639,7 @@ int main()
                         do
                         {
                             system("cls");
-                            printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Cadastrar usuário.            |\t\t\tTipo: %c\n|    [2] Remover usuário.              |\n|    [3] Pesquisar usuário por nome.   |\n|    [4] Alterar senha.                |\n|    [5] Sair.                         |\nO======================================O\n\nR: ", atualUser->nome, atualUser->usuario, atualUser->tipo);
+                            printf("O======================================O\t\t\tInformações do usuário logado:\n|     Sistema de usuários - Logado     |\t\t\tNome: %sO======================================O\t\t\tUsuário: %s|    [1] Cadastrar usuário.            |\t\t\tTipo: %c\n|    [2] Remover usuário.              |\n|    [3] Pesquisar usuário por nome.   |\n|    [4] Alterar senha.                |\n|    [5] Sair.                         |\nO======================================O\n\nR: ", atualUser->UserNode.nome, atualUser->UserNode.usuario, atualUser->UserNode.tipo);
                             scanf("%d", &rOpc);
 
                             switch (rOpc)
@@ -714,7 +714,7 @@ int main()
                                     setbuf(stdin, NULL);
                                     scanf("%c", &novoUsuario->UserNode.tipo);
 
-                                    if (atualUser->tipo == 'S')
+                                    if (atualUser->UserNode.tipo == 'S')
                                     {
                                         if (novoUsuario->UserNode.tipo == 'A' || novoUsuario->UserNode.tipo == 'a')
                                         {
@@ -737,7 +737,7 @@ int main()
                                             verif2 = 1;
                                         }
                                     }
-                                    else if (atualUser->tipo == 'A')
+                                    else if (atualUser->UserNode.tipo == 'A')
                                     {
                                         if (novoUsuario->UserNode.tipo == 'A' || novoUsuario->UserNode.tipo == 'a')
                                         {
@@ -860,7 +860,7 @@ int main()
                                 TempNewPassW = H(TempNewPassW);
 
                                 // Passando a senha com HASH para a estrutura que ajuda na verificação de login.
-                                strcpy(atualUser->senha, TempNewPassW);
+                                strcpy(atualUser->UserNode.senha, TempNewPassW);
 
                                 if (changePassword(Lista, usersDataBase, atualUser, TempNewPassW) == 0)
                                 {
@@ -883,15 +883,14 @@ int main()
 
                                 for (node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
                                 {
-                                    if (Node->isOnFile == 0)
+                                    if (Node->isOnFile == 0 && atualUser->UserNode.tipo!=Node->UserNode.tipo)
                                     {
-                                        verif2 = 1;
-                                        break;
+                                        verif2++;
                                     }
                                 }
                                 proxTela();
 
-                                if (verif2 == 1)
+                                if (verif2 != 0)
                                 {
                                     do
                                     {
@@ -922,7 +921,7 @@ int main()
                                     {
                                         for (node *Node = Lista->inicio; Node != NULL; Node = Node->proximo)
                                         {
-                                            if (Node->isOnFile == 0)
+                                            if (Node->isOnFile == 0 && atualUser->UserNode.tipo != Node->UserNode.tipo)
                                             {
                                                 printf("Informações do usuário:\n\n");
                                                 printuser(Node);
