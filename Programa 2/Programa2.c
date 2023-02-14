@@ -335,6 +335,7 @@ int verifLogin(list *Lista, node *atualUser)
             {
                 verif = 0; // Senha verificada
                 atualUser->UserNode = I->UserNode;
+                break;
             }
         }
     }
